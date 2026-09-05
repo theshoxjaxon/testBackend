@@ -1,0 +1,2903 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backend Node.js — Mock Exam</title>
+  <style>
+    :root {
+      --bg: #0e1117;
+      --panel: #161b22;
+      --panel2: #1c2430;
+      --border: #2a3441;
+      --text: #e6edf3;
+      --muted: #93a1b0;
+      --accent: #2dd4bf;
+      --accent2: #6366f1;
+      --green: #3fb950;
+      --red: #f85149;
+      --amber: #d29922;
+      --code: #0b0f14;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.55;
+      padding: 0 16px 130px
+    }
+
+    .wrap {
+      max-width: 880px;
+      margin: 0 auto
+    }
+
+    header {
+      padding: 36px 0 10px;
+      text-align: center
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: -.5px
+    }
+
+    header p {
+      color: var(--muted);
+      margin: 8px 0 0;
+      font-size: 14px
+    }
+
+    .badges {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 14px
+    }
+
+    .badge {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 22px 0 6px;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      padding: 12px 0;
+      z-index: 5;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .fbtn {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: .12s
+    }
+
+    .fbtn:hover {
+      border-color: var(--accent2);
+      color: var(--text)
+    }
+
+    .fbtn.active {
+      background: var(--accent);
+      color: #04211d;
+      border-color: var(--accent)
+    }
+
+    #noPractical {
+      display: none;
+      color: var(--muted);
+      font-size: 13.5px;
+      background: var(--panel);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      margin: 12px 0
+    }
+
+    .progress-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin: 20px 0 4px
+    }
+
+    .prog-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--accent2);
+      margin-bottom: 12px
+    }
+
+    .prog-stats {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px
+    }
+
+    .prog-stat {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 62px
+    }
+
+    .prog-stat b {
+      color: var(--text);
+      font-size: 15px
+    }
+
+    .prog-chart svg {
+      display: block;
+      width: 100%;
+      height: auto
+    }
+
+    .prog-empty {
+      color: var(--muted);
+      font-size: 13.5px;
+      text-align: center;
+      padding: 22px
+    }
+
+    .prog-hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px
+    }
+
+    .mock-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 9px 0;
+      flex-wrap: wrap
+    }
+
+    .mock-lab {
+      width: 88px;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .mock-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap
+    }
+
+    .mock-sel {
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 11px;
+      font-family: inherit;
+      font-size: 13px
+    }
+
+    .mock-start {
+      margin-top: 12px;
+      font-size: 15px;
+      padding: 12px 22px
+    }
+
+    #mockSetup .prog-head {
+      color: var(--accent)
+    }
+
+    #testBar {
+      display: none;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(13, 17, 23, .97);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      padding: 12px 16px;
+      z-index: 20
+    }
+
+    #testBar .bar-inner {
+      max-width: 880px;
+      margin: 0 auto;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .test-timer {
+      font-size: 22px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent)
+    }
+
+    .test-timer.danger {
+      color: var(--red)
+    }
+
+    #testCount {
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    #btnQuitTest {
+      margin-left: auto
+    }
+
+    #testResult {
+      display: none;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 22px;
+      margin: 20px 0
+    }
+
+    .res-top {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      flex-wrap: wrap;
+      margin-bottom: 16px
+    }
+
+    .res-score {
+      font-size: 54px;
+      font-weight: 800;
+      line-height: 1
+    }
+
+    .res-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 14px;
+      color: var(--muted)
+    }
+
+    .res-badge {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 13px;
+      width: fit-content
+    }
+
+    .res-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 4px 0 16px;
+      font-size: 13.5px
+    }
+
+    .res-table th {
+      text-align: left;
+      color: var(--muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 4px
+    }
+
+    .res-table td {
+      padding: 6px 4px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .res-btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    body.test-active #progress,
+    body.test-active #filters,
+    body.test-active #mockSetup,
+    body.test-active .bar,
+    body.test-active #bTitle,
+    body.test-active #bSub,
+    body.test-active #noPractical,
+    body.test-active .divider,
+    body.test-active #aTitle,
+    body.test-active #aSub {
+      display: none !important
+    }
+
+    body.test-active:not(.with-code) #practicals {
+      display: none !important
+    }
+
+    body.test-active #interview {
+      display: none !important
+    }
+
+    .iv-card {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 10px 0;
+      min-height: 110px
+    }
+
+    .iv-tag {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+      margin-bottom: 9px
+    }
+
+    .iv-q {
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.5
+    }
+
+    .iv-a {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      color: #cdd9e5;
+      font-size: 14.5px;
+      line-height: 1.62;
+      display: none
+    }
+
+    .iv-a.show {
+      display: block
+    }
+
+    .iv-a code {
+      background: var(--code);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 13px
+    }
+
+    .iv-ctrls {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 8px
+    }
+
+    .section-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      margin: 34px 0 4px;
+      font-weight: 700
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 12px
+    }
+
+    .grouphead {
+      margin: 26px 0 2px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent2)
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin: 12px 0
+    }
+
+    .qnum {
+      color: var(--accent2);
+      font-weight: 700;
+      font-size: 12.5px
+    }
+
+    .qhead {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2px;
+      flex-wrap: wrap
+    }
+
+    .qtag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+      background: var(--code);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 999px
+    }
+
+    .practical {
+      margin: 0
+    }
+
+    .qtext {
+      font-weight: 600;
+      margin: 4px 0 12px
+    }
+
+    .qtext code,
+    .section-sub code {
+      background: var(--code);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: 13px
+    }
+
+    pre {
+      background: var(--code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      overflow-x: auto;
+      font-size: 12.5px;
+      margin: 8px 0;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      line-height: 1.55
+    }
+
+    .opt {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 6px 0;
+      cursor: pointer;
+      transition: .12s;
+      background: var(--panel2)
+    }
+
+    .opt:hover {
+      border-color: var(--accent2)
+    }
+
+    .opt input {
+      margin-top: 3px;
+      accent-color: var(--accent2)
+    }
+
+    .opt.correct {
+      border-color: var(--green);
+      background: rgba(63, 185, 80, .10)
+    }
+
+    .opt.wrong {
+      border-color: var(--red);
+      background: rgba(248, 81, 73, .10)
+    }
+
+    .opt code {
+      background: var(--code);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 12.5px
+    }
+
+    .explain {
+      display: none;
+      margin-top: 11px;
+      padding: 11px 13px;
+      border-left: 3px solid var(--accent);
+      background: var(--panel2);
+      border-radius: 0 8px 8px 0;
+      font-size: 13.5px;
+      color: #cdd9e5
+    }
+
+    .explain.show {
+      display: block
+    }
+
+    .explain b {
+      color: var(--accent)
+    }
+
+    .codeblank {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 12.5px;
+      background: var(--code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      line-height: 2.15;
+      white-space: pre
+    }
+
+    .blank {
+      display: inline-block;
+      background: #0e1621;
+      border: 1px solid var(--accent2);
+      color: var(--accent);
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-family: inherit;
+      font-size: 12.5px;
+      width: 120px;
+      text-align: center;
+      outline: none
+    }
+
+    .blank:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(45, 212, 191, .2)
+    }
+
+    .blank.ok {
+      border-color: var(--green);
+      color: var(--green);
+      background: rgba(63, 185, 80, .08)
+    }
+
+    .blank.no {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(248, 81, 73, .08)
+    }
+
+    .cmt {
+      color: #6a7d8f
+    }
+
+    .kw {
+      color: #ff7b72
+    }
+
+    .str {
+      color: #a5d6ff
+    }
+
+    .fn {
+      color: #d2a8ff
+    }
+
+    .num {
+      color: #79c0ff
+    }
+
+    .bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(13, 17, 23, .96);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      padding: 12px 16px;
+      z-index: 10
+    }
+
+    .bar-inner {
+      max-width: 880px;
+      margin: 0 auto;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 10px 18px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: .15s
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #04211d;
+      border-color: var(--accent)
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08)
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text)
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent2)
+    }
+
+    #score {
+      font-weight: 700;
+      font-size: 14px
+    }
+
+    .pill {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    .timer {
+      color: var(--muted);
+      font-size: 13px;
+      margin-left: auto;
+      font-variant-numeric: tabular-nums
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 38px 0 0
+    }
+
+    .toc {
+      color: var(--muted);
+      font-size: 12.5px;
+      margin: 6px 0 0
+    }
+
+    a {
+      color: var(--accent)
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <h1>🧪 Backend Node.js — Mock Exam</h1>
+      <p id="hSub">FAANG-level practice test · built from your Figma course + Second Brain notes</p>
+      <div class="badges">
+        <span class="badge">Node Core</span>
+        <span class="badge">Express</span>
+        <span class="badge">Async</span>
+        <span class="badge">REST API</span>
+        <span class="badge">MongoDB / Mongoose</span>
+        <span class="badge">Auth &amp; Security</span>
+      </div>
+      <p class="toc" id="hToc">99 conceptual questions · 12 code practicals · 46 fill-in blanks</p>
+    </header>
+
+    <div class="progress-panel" id="progress">
+      <div class="prog-head">
+        <span id="progTitle">📈 Your Progress</span>
+        <button class="fbtn" id="progClear" onclick="clearHistory()"
+          style="font-size:12px;padding:5px 11px">Clear</button>
+      </div>
+      <div id="progressStats" class="prog-stats"></div>
+      <div id="progressChart" class="prog-chart"></div>
+      <div class="prog-hint" id="progHint"></div>
+    </div>
+
+    <div class="progress-panel" id="mockSetup"></div>
+    <div id="testResult"></div>
+    <div class="progress-panel" id="interview"></div>
+
+    <div class="filters" id="filters"></div>
+
+    <div class="section-title" id="aTitle">Part A · Conceptual Questions</div>
+    <p class="section-sub" id="aSub">Pick the single best answer. Many are deliberately tricky — read every option. Use
+      the buttons above to study one topic at a time.</p>
+    <div id="quiz"></div>
+
+    <div class="divider"></div>
+    <div class="section-title" id="bTitle">Part B · Code Practicals — Fill the Blanks</div>
+    <p class="section-sub" id="bSub">Type only what goes in each blank. Strings don't need quotes. Click <b>Check
+        Answers</b> to grade everything.</p>
+
+    <div id="noPractical">No code practical for this section. Try <b>MongoDB</b>, <b>Express</b>, <b>Auth</b>, or
+      <b>Node.js</b>.</div>
+    <div id="practicals">
+      <div class="grouphead" id="p1h">Practical 1 — JWT <code style="color:var(--accent)">protect</code> middleware
+      </div>
+      <div class="card">
+        <div class="codeblank"><span class="cmt">// Guards protected routes</span>
+          <span class="kw">const</span> jwt = <span class="fn">require</span>(<span class="str">"jsonwebtoken"</span>);
+
+          <span class="kw">function</span> <span class="fn">protect</span>(req, res, next) {
+          <span class="kw">const</span> authHeader = req.headers.authorization;
+          <span class="kw">let</span> token;
+          <span class="kw">if</span> (authHeader &amp;&amp; authHeader.<span class="fn">startsWith</span>(<span
+            class="str">"</span><input class="blank" data-p="1" data-b="0" placeholder="b1"><span class="str">"</span>))
+          {
+          token = authHeader.<input class="blank" data-p="1" data-b="1" placeholder="b2">(<span class="str">"
+            "</span>)[<span class="num">1</span>];
+          }
+          <span class="kw">if</span> (!token) <span class="kw">return</span> res.<span class="fn">status</span>(<input
+            class="blank" data-p="1" data-b="2" placeholder="b3">).<span class="fn">json</span>({ error: <span
+            class="str">"Not authenticated"</span> });
+          <span class="kw">try</span> {
+          <span class="kw">const</span> decoded = jwt.<input class="blank" data-p="1" data-b="3"
+            placeholder="b4">(token, process.env.JWT_SECRET);
+          req.user = decoded;
+          <input class="blank" data-p="1" data-b="4" placeholder="b5">();
+          } <span class="kw">catch</span> (err) {
+          <span class="kw">return</span> res.<span class="fn">status</span>(<span class="num">401</span>).<span
+            class="fn">json</span>({ error: <span class="str">"Invalid token"</span> });
+          }
+          }
+        </div>
+        <div class="explain" id="exp-p1"></div>
+      </div>
+
+      <div class="grouphead" id="p2h">Practical 2 — Bcrypt password methods</div>
+      <div class="card">
+        <div class="codeblank"><span class="cmt">// Hash on save, verify on login</span>
+          <span class="kw">const</span> bcrypt = <span class="fn">require</span>(<span class="str">"bcryptjs"</span>);
+
+          userSchema.pre(<span class="str">"save"</span>, <span class="kw">async function</span> (next) {
+          <span class="kw">if</span> (!<span class="kw">this</span>.<span class="fn">isModified</span>(<span
+            class="str">"password"</span>)) <span class="kw">return</span> <span class="fn">next</span>();
+          <span class="kw">this</span>.password = <span class="kw">await</span> bcrypt.<input class="blank" data-p="2"
+            data-b="0" placeholder="b1">(<span class="kw">this</span>.password, <input class="blank" data-p="2"
+            data-b="1" placeholder="b2" style="width:60px">);
+          <span class="fn">next</span>();
+          });
+
+          userSchema.methods.comparePassword = <span class="kw">async function</span> (candidate) {
+          <span class="kw">return</span> <span class="kw">await</span> bcrypt.<input class="blank" data-p="2" data-b="2"
+            placeholder="b3">(candidate, <span class="kw">this</span>.password);
+          };
+        </div>
+        <div class="explain" id="exp-p2"></div>
+      </div>
+
+      <div class="grouphead" id="p3h">Practical 3 — Express controller + <code
+          style="color:var(--accent)">catchAsync</code></div>
+      <div class="card">
+        <div class="codeblank"><span class="cmt">// Async error handling without try/catch</span>
+          <span class="kw">const</span> catchAsync = (fn) =&gt; (req, res, next) =&gt;
+          Promise.<span class="fn">resolve</span>(<span class="fn">fn</span>(req, res, next)).<input class="blank"
+            data-p="3" data-b="0" placeholder="b1">(next);
+
+          exports.getUser = <span class="fn">catchAsync</span>(<span class="kw">async</span> (req, res) =&gt; {
+          <span class="kw">const</span> user = <span class="kw">await</span> User.<input class="blank" data-p="3"
+            data-b="1" placeholder="b2">(req.params.id);
+          <span class="kw">if</span> (!user) <span class="kw">throw</span> <span class="kw">new</span> <span
+            class="fn">AppError</span>(<span class="str">"User not found"</span>, <input class="blank" data-p="3"
+            data-b="2" placeholder="b3">);
+          res.<span class="fn">status</span>(<span class="num">200</span>).<input class="blank" data-p="3" data-b="3"
+            placeholder="b4">({ success: <span class="kw">true</span>, data: user });
+          });
+        </div>
+        <div class="explain" id="exp-p3"></div>
+      </div>
+
+      <div class="grouphead" id="p4h">Practical 4 — Mongoose schema</div>
+      <div class="card">
+        <div class="codeblank"><span class="cmt">// User model with validation</span>
+          <span class="kw">const</span> userSchema = <span class="kw">new</span> mongoose.<input class="blank"
+            data-p="4" data-b="0" placeholder="b1">({
+          email: { type: String, <input class="blank" data-p="4" data-b="1" placeholder="b2">: <span
+            class="kw">true</span>, unique: <span class="kw">true</span>, lowercase: <span class="kw">true</span> },
+          role: { type: String, <input class="blank" data-p="4" data-b="2" placeholder="b3">: [<span
+            class="str">"user"</span>, <span class="str">"admin"</span>], default: <span class="str">"user"</span> },
+          age: { type: <input class="blank" data-p="4" data-b="3" placeholder="b4">, min: <span class="num">0</span> },
+          }, { <input class="blank" data-p="4" data-b="4" placeholder="b5">: <span class="kw">true</span> }); <span
+            class="cmt">// auto createdAt / updatedAt</span>
+        </div>
+        <div class="explain" id="exp-p4"></div>
+      </div>
+
+      <div class="grouphead" id="p5h">Practical 5 — EventEmitter</div>
+      <div class="card">
+        <div class="codeblank"><span class="cmt">// Custom event-driven logger</span>
+          <span class="kw">const</span> EventEmitter = <span class="fn">require</span>(<span class="str">"</span><input
+            class="blank" data-p="5" data-b="0" placeholder="b1"><span class="str">"</span>);
+
+          <span class="kw">class</span> Logger <span class="kw">extends</span> <input class="blank" data-p="5"
+            data-b="1" placeholder="b2"> {}
+          <span class="kw">const</span> log = <span class="kw">new</span> <span class="fn">Logger</span>();
+
+          log.<input class="blank" data-p="5" data-b="2" placeholder="b3">(<span class="str">"message"</span>, (data)
+          =&gt; console.<span class="fn">log</span>(data));
+          log.<input class="blank" data-p="5" data-b="3" placeholder="b4">(<span class="str">"message"</span>, <span
+            class="str">"hello"</span>);
+        </div>
+        <div class="explain" id="exp-p5"></div>
+      </div>
+
+      <div class="grouphead" id="p6h">Practical 6 — Async / <code style="color:var(--accent)">Promise.all</code></div>
+      <div class="card">
+        <div class="codeblank"><span class="cmt">// Run two async calls concurrently</span>
+          <input class="blank" data-p="6" data-b="0" placeholder="b1"> <span class="kw">function</span> <span
+            class="fn">loadDashboard</span>() {
+          <span class="kw">const</span> [user, posts] = <input class="blank" data-p="6" data-b="1" placeholder="b2">
+          Promise.<input class="blank" data-p="6" data-b="2" placeholder="b3">([
+          <span class="fn">getUser</span>(),
+          <span class="fn">getPosts</span>(),
+          ]);
+          <span class="kw">return</span> { user, posts };
+          }
+        </div>
+        <div class="explain" id="exp-p6"></div>
+      </div>
+
+      <div class="grouphead" id="p7h">Practical 7 — Raw Node HTTP server</div>
+      <div class="card">
+        <div class="codeblank"><span class="cmt">// The server Express abstracts away</span>
+          <span class="kw">const</span> http = <span class="fn">require</span>(<span class="str">"http"</span>);
+
+          <span class="kw">const</span> server = http.<input class="blank" data-p="7" data-b="0" placeholder="b1">((req,
+          res) =&gt; {
+          res.<input class="blank" data-p="7" data-b="1" placeholder="b2">(<span class="num">200</span>, { <span
+            class="str">"Content-Type"</span>: <span class="str">"application/json"</span> });
+          res.<input class="blank" data-p="7" data-b="2" placeholder="b3">(JSON.<span class="fn">stringify</span>({ ok:
+          <span class="kw">true</span> }));
+          });
+
+          server.<input class="blank" data-p="7" data-b="3" placeholder="b4">(<span class="num">3000</span>);
+        </div>
+        <div class="explain" id="exp-p7"></div>
+      </div>
+
+      <div class="grouphead" id="p8h">Practical 8 — Role guard <code style="color:var(--accent)">restrictTo</code></div>
+      <div class="card">
+        <div class="codeblank"><span class="cmt">// Runs AFTER protect (needs req.user)</span>
+          exports.restrictTo = (...roles) =&gt; {
+          <span class="kw">return</span> (req, res, next) =&gt; {
+          <span class="kw">if</span> (!roles.<input class="blank" data-p="8" data-b="0"
+            placeholder="b1">(req.user.role)) {
+          <span class="kw">return</span> <span class="fn">next</span>(<span class="kw">new</span> <span
+            class="fn">AppError</span>(<span class="str">"Forbidden"</span>, <input class="blank" data-p="8" data-b="1"
+            placeholder="b2">));
+          }
+          <input class="blank" data-p="8" data-b="2" placeholder="b3">();
+          };
+          };
+        </div>
+        <div class="explain" id="exp-p8"></div>
+      </div>
+
+      <div class="grouphead" id="p9h">Practical 9 — ES Modules + fs callback</div>
+      <div class="card">
+        <div class="codeblank"><span class="cmt">// Default import + error-first callback(err, data)</span>
+          <span class="kw">import</span> fs <span class="kw">from</span> <span class="str">"</span><input class="blank"
+            data-p="9" data-b="0" placeholder="b1"><span class="str">"</span>;
+
+          fs.<input class="blank" data-p="9" data-b="1" placeholder="b2">(<span class="str">"log.txt"</span>, <span
+            class="str">"hello\n"</span>, (<input class="blank" data-p="9" data-b="2" placeholder="b3">, data) =&gt; {
+          <span class="kw">if</span> (err) <span class="kw">return</span> console.<span class="fn">error</span>(err);
+          console.<span class="fn">log</span>(<span class="str">"appended"</span>);
+          });
+        </div>
+        <div class="explain" id="exp-p9"></div>
+      </div>
+
+      <div class="grouphead" id="p10h">Practical 10 — Express Router + mounting</div>
+      <div class="card">
+        <div class="codeblank"><span class="cmt">// routes/users.js</span>
+          <span class="kw">const</span> express = <span class="fn">require</span>(<span class="str">"express"</span>);
+          <span class="kw">const</span> router = express.<input class="blank" data-p="10" data-b="0"
+            placeholder="b1">();
+          router.<span class="fn">get</span>(<span class="str">"/"</span>, getUsers);
+          module.exports = router;
+
+          <span class="cmt">// app.js</span>
+          app.<span class="fn">use</span>(express.<input class="blank" data-p="10" data-b="1" placeholder="b2">());
+          <span class="cmt">// before routes!</span>
+          app.<input class="blank" data-p="10" data-b="2" placeholder="b3">(<span class="str">"/api/users"</span>,
+          userRouter);
+        </div>
+        <div class="explain" id="exp-p10"></div>
+      </div>
+
+      <div class="grouphead" id="p11h">Practical 11 — Register / Login flow</div>
+      <div class="card">
+        <div class="codeblank"><span class="cmt">// models/User.js</span>
+          <span class="kw">const</span> userSchema = <span class="kw">new</span> mongoose.<input class="blank"
+            data-p="11" data-b="0" placeholder="b1">({
+          email: { type: String, required: <span class="kw">true</span>, unique: <span class="kw">true</span> },
+          password: { type: String, required: <span class="kw">true</span>, select: <span class="kw">false</span> },
+          });
+
+          userSchema.pre(<span class="str">"save"</span>, <span class="kw">async function</span> (next) {
+          <span class="kw">if</span> (!<span class="kw">this</span>.<span class="fn">isModified</span>(<span
+            class="str">"password"</span>)) <span class="kw">return</span> <span class="fn">next</span>();
+          <span class="kw">this</span>.password = <span class="kw">await</span> bcrypt.<input class="blank" data-p="11"
+            data-b="1" placeholder="b2">(<span class="kw">this</span>.password, <span class="num">12</span>);
+          <span class="fn">next</span>();
+          });
+
+          userSchema.methods.comparePassword = <span class="kw">function</span> (candidate) {
+          <span class="kw">return</span> bcrypt.<input class="blank" data-p="11" data-b="2" placeholder="b3">(candidate,
+          <span class="kw">this</span>.password);
+          };
+
+          <span class="kw">const</span> User = mongoose.<input class="blank" data-p="11" data-b="3"
+            placeholder="b4">(<span class="str">"User"</span>, userSchema);
+
+          <span class="cmt">// login controller</span>
+          <span class="kw">const</span> user = <span class="kw">await</span> User.<input class="blank" data-p="11"
+            data-b="4" placeholder="b5">({ email }).<span class="fn">select</span>(<span
+            class="str">"+password"</span>);
+        </div>
+        <div class="explain" id="exp-p11"></div>
+      </div>
+
+      <div class="grouphead" id="p12h">Practical 12 — Pagination + req.query typing</div>
+      <div class="card">
+        <div class="codeblank"><span class="cmt">// GET /products?page=2&limit=10 — req.query values are ALWAYS
+            strings</span>
+          <span class="kw">const</span> page = <input class="blank" data-p="12" data-b="0"
+            placeholder="b1">(req.query.page) || <span class="num">1</span>;
+          <span class="kw">const</span> limit = <input class="blank" data-p="12" data-b="1"
+            placeholder="b2">(req.query.limit) || <span class="num">10</span>;
+          <span class="kw">const</span> skip = (page - <span class="num">1</span>) * <input class="blank" data-p="12"
+            data-b="2" placeholder="b3">;
+          <span class="kw">const</span> items = <span class="kw">await</span> Product.<span
+            class="fn">find</span>().<span class="fn">skip</span>(skip).<input class="blank" data-p="12" data-b="3"
+            placeholder="b4">(limit);
+        </div>
+        <div class="explain" id="exp-p12"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <div class="bar-inner">
+      <button class="btn-primary" id="btnCheck" onclick="grade()">Check Answers</button>
+      <button class="btn-ghost" id="btnShuffle" onclick="shuffleAll()">🔀 Shuffle</button>
+      <button class="btn-ghost" id="btnShow" onclick="toggleSolutions()">Show Solutions</button>
+      <button class="btn-ghost" id="btnReset" onclick="resetAll()">Reset</button>
+      <button class="btn-ghost" id="btnLang" onclick="toggleLang()">🌐 O‘zbekcha</button>
+      <span id="score"></span>
+      <span class="timer" id="timer">00:00</span>
+    </div>
+  </div>
+
+  <div id="testBar">
+    <div class="bar-inner">
+      <span class="test-timer" id="testTimer">00:00</span>
+      <span id="testCount"></span>
+      <button class="btn-primary" id="btnSubmitTest" onclick="submitMockTest(false)">Submit Test</button>
+      <button class="btn-ghost" id="btnQuitTest" onclick="exitMockTest()">Quit</button>
+    </div>
+  </div>
+
+  <script>
+    // ---------------- Question bank (52) ----------------
+    const QUESTIONS = [
+      // ===== NODE CORE =====
+      {
+        g: "Node.js Core",
+        q: 'Exact console output order?<pre>console.log("A");\nsetTimeout(() => console.log("B"), 0);\nPromise.resolve().then(() => console.log("C"));\nprocess.nextTick(() => console.log("D"));\nconsole.log("E");</pre>',
+        opts: ['A E D C B', 'A E C D B', 'A B C D E', 'A E B C D'], correct: 0,
+        exp: 'Sync first: <b>A, E</b>. Then microtasks — <code>process.nextTick</code> drains before the Promise queue: <b>D</b>, then <b>C</b>. Finally the timer macrotask: <b>B</b>.'
+      },
+
+      {
+        g: "Node.js Core",
+        q: 'In CommonJS, how do you export a value from a module?',
+        opts: ['<code>export default value</code>', '<code>module.exports = value</code>', '<code>exports value</code>', '<code>return value</code>'], correct: 1,
+        exp: 'CommonJS (Node default) uses <code>module.exports = ...</code> and <code>require()</code>. <code>export default</code> is ES-module syntax.'
+      },
+
+      {
+        g: "Node.js Core",
+        q: 'What is wrong with <code>const data = fs.readFileSync("big.txt")</code> inside a web server?',
+        opts: ['It throws on large files', 'It blocks the event loop, freezing all other requests until it finishes', 'It cannot read text files', 'Nothing — it is the recommended way'], correct: 1,
+        exp: 'Sync I/O blocks the single JS thread, so no other request is served while it runs. Use the async <code>fs.readFile</code> / <code>fs.promises</code> in servers.'
+      },
+
+      {
+        g: "Node.js Core",
+        q: 'For <code>node app.js hello world</code>, what is <code>process.argv[2]</code>?',
+        opts: ['<code>"app.js"</code>', '<code>"node"</code>', '<code>"hello"</code>', '<code>"world"</code>'], correct: 2,
+        exp: '<code>argv[0]</code> = node path, <code>argv[1]</code> = script path, so the first real user argument is <code>argv[2]</code> → <code>"hello"</code>.'
+      },
+
+      {
+        g: "Node.js Core",
+        q: 'Why read a huge file with a <b>stream</b> instead of <code>fs.readFile</code>?',
+        opts: ['Streams are always faster', 'Streams process data in chunks, keeping memory usage low instead of loading the whole file at once', 'Streams compress the file', 'readFile cannot read big files'], correct: 1,
+        exp: 'A stream emits <code>data</code> events in chunks, so you never hold the entire file in memory — essential for large files and backpressure handling.'
+      },
+
+      {
+        g: "Node.js Core",
+        q: 'What is a Node.js <code>Buffer</code>?',
+        opts: ['A UTF-8 string wrapper', 'A fixed-length chunk of raw binary data outside the V8 heap', 'A logging queue', 'A type of Promise'], correct: 1,
+        exp: 'A <code>Buffer</code> is fixed-length raw binary memory — used for file, network and crypto bytes before decoding to a string.'
+      },
+
+      {
+        g: "Node.js Core",
+        q: '<code>__dirname</code> gives you…',
+        opts: ['The current working directory (where node was launched)', 'The absolute path of the directory containing the current module file', 'The user home directory', 'The project root always'], correct: 1,
+        exp: '<code>__dirname</code> = the folder of the current file. <code>process.cwd()</code> is where node was launched — they often differ.'
+      },
+
+      {
+        g: "Node.js Core",
+        q: 'On an <code>EventEmitter</code>, which pair is correct?',
+        opts: ['<code>.subscribe()</code> registers, <code>.publish()</code> fires', '<code>.on()</code> registers a listener, <code>.emit()</code> triggers it', '<code>.listen()</code> registers, <code>.send()</code> fires', '<code>.then()</code> registers, <code>.resolve()</code> fires'], correct: 1,
+        exp: 'You register listeners with <code>.on(event, cb)</code> and fire them synchronously with <code>.emit(event, ...args)</code>.'
+      },
+
+      {
+        g: "Node.js Core",
+        q: 'Why prefer <code>path.join(__dirname, "data", "f.txt")</code> over string concatenation?',
+        opts: ['It is shorter', 'It normalizes separators and handles cross-platform paths (Windows vs POSIX)', 'It caches the path', 'It reads the file too'], correct: 1,
+        exp: '<code>path.join</code> uses the correct OS separator and collapses redundant slashes/segments, avoiding broken paths across platforms.'
+      },
+
+      {
+        g: "Node.js Core",
+        q: 'Which is appropriate for storing user passwords?',
+        opts: ['<code>crypto.createHash("md5")</code>', 'A single <code>sha256</code> hash', '<code>bcrypt</code> (or argon2) with a salt and cost factor', 'Base64 encoding'], correct: 2,
+        exp: 'Fast hashes (md5/sha256) are brute-forceable and unsalted. <b>bcrypt</b>/argon2 are deliberately slow and salted, designed for passwords.'
+      },
+
+      {
+        g: "Node.js Core",
+        q: 'Difference between <code>child_process.spawn</code> and <code>exec</code>?',
+        opts: ['They are identical', '<code>spawn</code> streams output and suits large/long output; <code>exec</code> buffers all output into memory', '<code>exec</code> is async, <code>spawn</code> is sync', '<code>spawn</code> cannot pass arguments'], correct: 1,
+        exp: '<code>spawn</code> returns a streaming interface (good for large output); <code>exec</code> buffers stdout/stderr into a callback (simpler, but memory-bounded).'
+      },
+
+      {
+        g: "Node.js Core",
+        q: 'What does <code>process.on("uncaughtException", ...)</code> let you do?',
+        opts: ['Ignore all errors safely forever', 'Catch a synchronous error that bubbled to the top — typically log it and exit the process', 'Retry the failed function automatically', 'Convert errors to warnings'], correct: 1,
+        exp: 'It is a last-resort handler for otherwise-uncaught sync errors. Best practice: log, do minimal cleanup, then <code>process.exit(1)</code> — the process state is unreliable.'
+      },
+
+      // ===== EXPRESS =====
+      {
+        g: "Express.js",
+        q: 'What is the correct middleware signature in Express?',
+        opts: ['<code>(req, res)</code>', '<code>(req, res, next)</code>', '<code>(next, req, res)</code>', '<code>(err, req)</code>'], correct: 1,
+        exp: 'Regular middleware is <code>(req, res, next)</code>; it must call <code>next()</code> to continue or send a response to end the chain.'
+      },
+
+      {
+        g: "Express.js",
+        q: 'What happens if a middleware never calls <code>next()</code> and never sends a response?',
+        opts: ['Express calls it again', 'The request hangs until it times out — no response is sent', 'It returns 404 automatically', 'The server crashes'], correct: 1,
+        exp: 'The request is stuck in the pipeline. Forgetting <code>next()</code> (or a response) is a classic cause of hanging requests.'
+      },
+
+      {
+        g: "Express.js",
+        q: 'Why must <code>app.use(express.json())</code> come before routes that read <code>req.body</code>?',
+        opts: ['Otherwise Express errors on startup', 'Middleware runs in order; without the parser first, <code>req.body</code> is undefined', 'It sets the response type', 'Only needed for GET'], correct: 1,
+        exp: 'Middleware executes top-to-bottom. The body parser must populate <code>req.body</code> before the handler runs.'
+      },
+
+      {
+        g: "Express.js",
+        q: 'How does Express recognize an error-handling middleware?',
+        opts: ['It is registered with <code>app.error()</code>', 'It has four parameters <code>(err, req, res, next)</code>', 'It returns a Promise', 'It is named errorHandler'], correct: 1,
+        exp: 'Detection is by <b>arity</b> — four args <code>(err, req, res, next)</code> — and it must be registered last.'
+      },
+
+      {
+        g: "Express.js",
+        q: 'Where does the value <code>5</code> come from in <code>GET /users/5</code> with route <code>/users/:id</code>?',
+        opts: ['<code>req.query.id</code>', '<code>req.body.id</code>', '<code>req.params.id</code>', '<code>req.headers.id</code>'], correct: 2,
+        exp: 'Named route segments (<code>:id</code>) are exposed on <code>req.params</code>. Query string values live on <code>req.query</code>.'
+      },
+
+      {
+        g: "Express.js",
+        q: 'For <code>GET /products?sort=price&limit=10</code>, how do you read <code>sort</code>?',
+        opts: ['<code>req.params.sort</code>', '<code>req.query.sort</code>', '<code>req.body.sort</code>', '<code>req.sort</code>'], correct: 1,
+        exp: 'Everything after <code>?</code> is the query string, parsed into <code>req.query</code>.'
+      },
+
+      {
+        g: "Express.js",
+        q: 'What does <code>app.use(express.static("public"))</code> do?',
+        opts: ['Caches all responses', 'Serves files in the <code>public</code> folder directly at the URL root', 'Blocks static files', 'Minifies CSS/JS'], correct: 1,
+        exp: 'It serves static assets — <code>public/logo.png</code> becomes available at <code>/logo.png</code>.'
+      },
+
+      {
+        g: "Express.js",
+        q: '<code>res.json(obj)</code> differs from <code>res.send(obj)</code> because it…',
+        opts: ['Is slower', 'Sets <code>Content-Type: application/json</code> and serializes with <code>JSON.stringify</code> consistently', 'Only works for arrays', 'Adds authentication'], correct: 1,
+        exp: '<code>res.json</code> guarantees the JSON content-type and stringification; <code>res.send</code> guesses the type from the argument.'
+      },
+
+      {
+        g: "Express.js",
+        q: '<code>router.use(protect)</code> at the top of a routes file means…',
+        opts: ['Only the first route is protected', 'Every route defined below that line requires auth', 'Nothing until you also call app.use', 'It disables the router'], correct: 1,
+        exp: 'Router-level middleware applies to all routes registered after it in that router — a clean way to protect a whole resource.'
+      },
+
+      {
+        g: "Express.js",
+        q: 'In the async wrapper <code>const catchAsync = fn => (req,res,next) => Promise.resolve(fn(req,res,next)).catch(next);</code>, the point is to…',
+        opts: ['Retry requests', 'Forward any rejected promise to Express error middleware via <code>next(err)</code>, removing try/catch', 'Cache responses', 'Parse the body'], correct: 1,
+        exp: 'A rejected async handler is caught and passed to <code>next</code>, so it reaches the global error handler — letting controllers just <code>throw</code>.'
+      },
+
+      // ===== REST =====
+      {
+        g: "REST API Design",
+        q: 'Which HTTP method is <b>NOT</b> idempotent?',
+        opts: ['<code>GET</code>', '<code>PUT</code>', '<code>POST</code>', '<code>DELETE</code>'], correct: 2,
+        exp: '<code>POST</code> creates a new resource on each call. GET/PUT/DELETE produce the same state whether called once or many times.'
+      },
+
+      {
+        g: "REST API Design",
+        q: 'Valid token but user lacks permission — correct status?',
+        opts: ['<code>400</code>', '<code>401</code>', '<code>403</code>', '<code>422</code>'], correct: 2,
+        exp: '<b>401</b> = not authenticated; <b>403</b> = authenticated but not allowed. Permission failure → 403.'
+      },
+
+      {
+        g: "REST API Design",
+        q: 'A successful <code>POST /users</code> that creates a resource returns…',
+        opts: ['<code>200 OK</code>', '<code>201 Created</code>', '<code>204 No Content</code>', '<code>202 Accepted</code>'], correct: 1,
+        exp: '<b>201 Created</b> signals a new resource was created, ideally with its representation and a <code>Location</code> header.'
+      },
+
+      {
+        g: "REST API Design",
+        q: 'A successful <code>DELETE</code> with no response body should use…',
+        opts: ['<code>200</code> with empty object', '<code>201</code>', '<code>204 No Content</code>', '<code>202</code>'], correct: 2,
+        exp: '<b>204 No Content</b> = success, intentionally empty body — idiomatic for DELETE.'
+      },
+
+      {
+        g: "REST API Design",
+        q: 'Registering with an email that already exists should return…',
+        opts: ['<code>400</code>', '<code>404</code>', '<code>409 Conflict</code>', '<code>500</code>'], correct: 2,
+        exp: 'A duplicate resource conflict is <b>409</b> — well-formed request that conflicts with current state.'
+      },
+
+      {
+        g: "REST API Design",
+        q: 'Key difference between <code>PUT</code> and <code>PATCH</code>?',
+        opts: ['PUT reads, PATCH writes', 'PUT replaces the whole resource; PATCH applies a partial update', 'They are identical', 'PATCH is not idempotent'], correct: 1,
+        exp: 'PUT sends the full representation (replace); PATCH sends only changed fields (partial). Both are idempotent.'
+      },
+
+      {
+        g: "REST API Design",
+        q: 'Which is the RESTful way to fetch one user?',
+        opts: ['<code>POST /getUser?id=5</code>', '<code>GET /users/5</code>', '<code>GET /getUserById/5</code>', '<code>POST /users/fetch/5</code>'], correct: 1,
+        exp: 'REST uses nouns + HTTP methods: <code>GET /users/5</code>. Verbs in the URL (getUser) are RPC-style, not REST.'
+      },
+
+      {
+        g: "REST API Design",
+        q: 'The REST "stateless" constraint means…',
+        opts: ['The server never stores data', 'Each request carries all info needed; the server keeps no client session between requests', 'Responses can never be cached', 'Only GET is allowed'], correct: 1,
+        exp: 'Statelessness: every request is self-contained (e.g. a token in the header), so any server instance can handle it — key for scaling.'
+      },
+
+      {
+        g: "REST API Design",
+        q: 'What does <code>GET /products?sort=-price</code> conventionally mean?',
+        opts: ['Filter price below zero', 'Sort by price descending (leading minus = desc)', 'Exclude the price field', 'Invalid syntax'], correct: 1,
+        exp: 'A common convention: <code>sort=price</code> ascending, <code>sort=-price</code> descending.'
+      },
+
+      {
+        g: "REST API Design",
+        q: 'A request is missing a required field. Most appropriate status?',
+        opts: ['<code>400 Bad Request</code> (or 422)', '<code>401</code>', '<code>403</code>', '<code>500</code>'], correct: 0,
+        exp: 'Invalid/missing input is the client\'s fault → <b>400</b> (some APIs use <b>422</b> specifically for validation). Never 500 for user input errors.'
+      },
+
+      {
+        g: "REST API Design",
+        q: 'Why version an API with <code>/api/v1/...</code>?',
+        opts: ['SEO', 'So breaking changes ship under <code>/v2</code> while old clients keep using <code>/v1</code>', 'It is required by HTTP', 'To enable caching'], correct: 1,
+        exp: 'Versioning lets you evolve the contract without breaking existing consumers — they stay on v1 until they migrate.'
+      },
+
+      // ===== MONGODB / MONGOOSE =====
+      {
+        g: "MongoDB & Mongoose",
+        q: 'Mongoose is best described as…',
+        opts: ['A SQL query builder', 'An ODM adding schemas, validation and middleware on top of MongoDB', 'A caching layer', 'A REST framework'], correct: 1,
+        exp: 'Mongoose is an <b>Object Document Mapper</b> — it models MongoDB documents with schemas, validation, hooks and helpers.'
+      },
+
+      {
+        g: "MongoDB & Mongoose",
+        q: '<code>password: { type:String, select:false }</code> means…',
+        opts: ['Password is never stored', 'Password is excluded from query results unless you add <code>.select("+password")</code>', 'Password becomes read-only', 'Password is auto-hashed'], correct: 1,
+        exp: '<code>select:false</code> hides the field from query output by default; you opt back in with <code>.select("+password")</code> at login.'
+      },
+
+      {
+        g: "MongoDB & Mongoose",
+        q: 'You need the hidden password at login. Correct query?',
+        opts: ['<code>User.findOne({email})</code>', '<code>User.findOne({email}).select("+password")</code>', '<code>User.findOne({email}).hidden()</code>', '<code>User.findOne({email}).lean()</code>'], correct: 1,
+        exp: 'Because the field is <code>select:false</code>, you must explicitly include it with <code>.select("+password")</code>.'
+      },
+
+      {
+        g: "MongoDB & Mongoose",
+        q: 'What does <code>{ timestamps: true }</code> add to a schema?',
+        opts: ['A version key', 'Automatic <code>createdAt</code> and <code>updatedAt</code> fields', 'A TTL index', 'A unique id'], correct: 1,
+        exp: 'Mongoose auto-manages <code>createdAt</code> and <code>updatedAt</code> on every save/update.'
+      },
+
+      {
+        g: "MongoDB & Mongoose",
+        q: 'In a <code>pre("save")</code> hook, why guard with <code>if (!this.isModified("password")) return next();</code>?',
+        opts: ['To skip empty saves', 'To avoid re-hashing an already-hashed password when other fields change', 'To prevent duplicate emails', 'To validate length'], correct: 1,
+        exp: 'Without the guard, updating any field would re-hash the already-hashed password, permanently breaking login.'
+      },
+
+      {
+        g: "MongoDB & Mongoose",
+        q: 'What does <code>.populate("author")</code> do?',
+        opts: ['Creates the author', 'Replaces the stored <code>author</code> ObjectId with the actual referenced document', 'Deletes orphan refs', 'Adds an index'], correct: 1,
+        exp: 'Populate performs a follow-up query and swaps the reference id for the full document from the referenced collection.'
+      },
+
+      {
+        g: "MongoDB & Mongoose",
+        q: 'Which query returns users aged 18 or older?',
+        opts: ['<code>find({ age: ">=18" })</code>', '<code>find({ age: { $gte: 18 } })</code>', '<code>find({ age: 18+ })</code>', '<code>find({ age >= 18 })</code>'], correct: 1,
+        exp: 'MongoDB comparison uses operators: <code>$gte</code> (≥), <code>$gt</code>, <code>$lte</code>, <code>$lt</code>, <code>$ne</code>, <code>$in</code>.'
+      },
+
+      {
+        g: "MongoDB & Mongoose",
+        q: '<code>await User.findById("nonexistent_but_valid_id")</code> when no doc matches…',
+        opts: ['Throws a NotFoundError', 'Returns <code>null</code>', 'Returns an empty array', 'Returns <code>undefined</code> and logs'], correct: 1,
+        exp: 'A valid-format id with no match resolves to <b>null</b> — you check for it and return 404 yourself. (A malformed id throws a CastError.)'
+      },
+
+      {
+        g: "MongoDB & Mongoose",
+        q: 'Setting <code>unique: true</code> on a schema field…',
+        opts: ['Is a Mongoose validator that runs before save', 'Creates a MongoDB unique index — duplicates surface as an E11000 error, not a ValidationError', 'Prevents null values', 'Hashes the field'], correct: 1,
+        exp: '<code>unique</code> is <b>not a validator</b>; it builds a unique index. Duplicates throw a Mongo <code>E11000</code> duplicate-key error you handle in your error middleware.'
+      },
+
+      {
+        g: "MongoDB & Mongoose",
+        q: 'Difference between a schema <code>methods</code> and <code>statics</code> function?',
+        opts: ['No difference', '<code>methods</code> run on a document instance (<code>this</code> = doc); <code>statics</code> run on the model (<code>this</code> = model)', 'statics are async only', 'methods cannot use this'], correct: 1,
+        exp: '<code>schema.methods.x</code> → <code>doc.x()</code> (this = document). <code>schema.statics.y</code> → <code>Model.y()</code> (this = model), e.g. <code>User.findByEmail()</code>.'
+      },
+
+      // ===== AUTH & SECURITY =====
+      {
+        g: "Auth & Security",
+        q: 'Hashing the same password twice with bcrypt yields…',
+        opts: ['Identical hashes', 'Different hashes — each embeds a fresh random salt', 'Different only if cost changes', 'Identical first 22 chars only'], correct: 1,
+        exp: 'A random salt per call means different 60-char hashes every time — which defeats rainbow tables. <code>compare</code> re-derives the salt from the stored hash.'
+      },
+
+      {
+        g: "Auth & Security",
+        q: 'A JWT payload is…',
+        opts: ['AES-encrypted with the secret', 'Base64url-encoded and readable by anyone; only the signature is protected', 'Hashed and undecodable', 'Stored server-side'], correct: 1,
+        exp: 'The payload is only <b>encoded</b>, not encrypted. The secret signs the signature (integrity). Never put secrets/passwords in it.'
+      },
+
+      {
+        g: "Auth & Security",
+        q: 'Storing a refresh token in an <code>httpOnly</code> cookie primarily…',
+        opts: ['Makes it expire faster', 'Prevents client JS from reading it, mitigating XSS token theft', 'Enables CORS', 'Compresses it'], correct: 1,
+        exp: '<code>httpOnly</code> hides the cookie from <code>document.cookie</code>, so injected scripts can\'t steal the token.'
+      },
+
+      {
+        g: "Auth & Security",
+        q: '<code>sameSite: "strict"</code> on a cookie mainly defends against…',
+        opts: ['XSS', 'CSRF (cross-site request forgery)', 'SQL injection', 'Brute force'], correct: 1,
+        exp: '<code>sameSite</code> stops the browser from sending the cookie on cross-site requests, the core of CSRF protection.'
+      },
+
+      {
+        g: "Auth & Security",
+        q: 'What does <code>app.use(helmet())</code> do?',
+        opts: ['Rate limits requests', 'Sets secure HTTP response headers (CSP, HSTS, X-Frame-Options, etc.)', 'Encrypts the body', 'Validates JWTs'], correct: 1,
+        exp: 'Helmet sets a bundle of security-related headers to reduce common web vulnerabilities.'
+      },
+
+      {
+        g: "Auth & Security",
+        q: 'CORS is a mechanism that…',
+        opts: ['Encrypts traffic', 'Controls which cross-origin browser requests your API permits, via response headers', 'Hashes passwords', 'Blocks SQL injection'], correct: 1,
+        exp: 'CORS uses headers like <code>Access-Control-Allow-Origin</code> to tell the browser which origins may call the API. It is a browser policy, not encryption.'
+      },
+
+      {
+        g: "Auth & Security",
+        q: '<code>express-rate-limit</code> chiefly protects against…',
+        opts: ['XSS', 'Brute-force / abusive request floods on endpoints like login', 'CSRF', 'Broken CORS'], correct: 1,
+        exp: 'Rate limiting caps requests per IP/window, blunting brute-force login attempts and basic DoS abuse.'
+      },
+
+      {
+        g: "Auth & Security",
+        q: 'Why must <code>restrictTo("admin")</code> run <b>after</b> <code>protect</code>?',
+        opts: ['Order does not matter', 'It reads <code>req.user.role</code>, which <code>protect</code> sets after verifying the token', 'protect needs the role first', 'They must run in parallel'], correct: 1,
+        exp: '<code>protect</code> verifies the JWT and attaches <code>req.user</code>. <code>restrictTo</code> then checks <code>req.user.role</code> — so it must come second.'
+      },
+
+      {
+        g: "Auth & Security",
+        q: 'The access-token / refresh-token pattern uses…',
+        opts: ['Two identical long-lived tokens', 'A short-lived access token plus a long-lived refresh token (often in an httpOnly cookie)', 'One token that never expires', 'Session cookies only'], correct: 1,
+        exp: 'Short access tokens limit exposure if leaked; the refresh token (stored securely) mints new access tokens without re-login.'
+      },
+
+      {
+        g: "Auth & Security",
+        q: 'Where should <code>JWT_SECRET</code> live?',
+        opts: ['Hardcoded in the controller', 'In an environment variable (<code>.env</code> / host config), never committed to source', 'In the JWT payload', 'In the client localStorage'], correct: 1,
+        exp: 'Secrets belong in environment config, out of version control. If the secret leaks, anyone can forge valid tokens.'
+      },
+
+      {
+        g: "Auth & Security",
+        q: 'At login, why return the same "Invalid credentials" message for both a wrong email and a wrong password?',
+        opts: ['To save code', 'To avoid revealing whether an email is registered (prevents user enumeration)', 'It is required by JWT', 'To return 200 always'], correct: 1,
+        exp: 'Distinct messages leak which emails exist. A single generic 401 message prevents account enumeration.'
+      },
+
+      // ===== HARDER SET =====
+      {
+        g: "Node.js Core",
+        q: 'Inside an I/O callback, what is the order of <code>setImmediate(cb)</code> vs <code>setTimeout(cb, 0)</code>?',
+        opts: ['Order is undefined', '<code>setImmediate</code> runs before <code>setTimeout(0)</code> when both are scheduled inside an I/O cycle', '<code>setTimeout(0)</code> always first', 'They fire simultaneously'], correct: 1,
+        exp: 'Inside an I/O callback the loop already passed the timers phase and enters the <b>check</b> phase next, so <code>setImmediate</code> fires before <code>setTimeout(0)</code>. (At the top level the order is not guaranteed.)'
+      },
+      {
+        g: "Node.js Core",
+        q: 'Which loop actually awaits each async call <b>sequentially</b>?',
+        opts: ['<code>arr.forEach(async x => { await f(x) })</code>', '<code>for (const x of arr) { await f(x) }</code>', '<code>arr.map(x => f(x))</code>', '<code>arr.filter(async x => await f(x))</code>'], correct: 1,
+        exp: '<code>forEach</code> ignores the returned promises (fire-and-forget), so it does not wait. Only <code>for...of</code> with <code>await</code> pauses each iteration. For concurrency use <code>await Promise.all(arr.map(f))</code>.'
+      },
+      {
+        g: "Node.js Core",
+        q: 'You fire 3 async calls; one may reject but you still want every outcome. Use…',
+        opts: ['<code>Promise.all</code>', '<code>Promise.allSettled</code>', '<code>Promise.race</code>', '<code>Promise.any</code>'], correct: 1,
+        exp: '<code>Promise.all</code> rejects as soon as one rejects (losing the rest). <code>Promise.allSettled</code> waits for all and returns each as <code>{status, value|reason}</code>.'
+      },
+      {
+        g: "Node.js Core",
+        q: 'A writable stream\'s <code>.write()</code> returns <code>false</code>. What does that signal?',
+        opts: ['The write failed permanently', 'The internal buffer is full — wait for the <code>"drain"</code> event before writing more (backpressure)', 'The stream is closed', 'The data was corrupted'], correct: 1,
+        exp: '<code>false</code> means the buffer exceeded its highWaterMark. Respect backpressure: stop writing until <code>"drain"</code> fires, or risk unbounded memory growth.'
+      },
+      {
+        g: "Node.js Core",
+        q: 'You must run a CPU-heavy computation without blocking the event loop. Best tool?',
+        opts: ['<code>setTimeout</code> chunks', '<code>worker_threads</code> (offload to a separate thread)', 'A bigger <code>for</code> loop', '<code>process.nextTick</code>'], correct: 1,
+        exp: 'CPU-bound work blocks the single JS thread. <code>worker_threads</code> runs it on another thread; <code>cluster</code> forks whole processes to scale I/O across cores.'
+      },
+      {
+        g: "REST API Design",
+        q: 'A client exceeded your rate limit. Correct status code?',
+        opts: ['<code>400</code>', '<code>403</code>', '<code>429 Too Many Requests</code>', '<code>503</code>'], correct: 2,
+        exp: '<b>429 Too Many Requests</b> tells the client it was rate-limited, ideally with a <code>Retry-After</code> header.'
+      },
+      {
+        g: "Express.js",
+        q: 'What does <code>express.Router({ mergeParams: true })</code> enable?',
+        opts: ['Automatic body parsing', 'Access to <code>:params</code> defined on a parent router (nested routes)', 'Merging two apps', 'Case-insensitive routes'], correct: 1,
+        exp: 'By default a child router can\'t see the parent\'s route params. <code>mergeParams:true</code> exposes them — needed for nested resources like <code>/users/:userId/posts</code>.'
+      },
+      {
+        g: "Auth & Security",
+        q: 'Which request triggers a CORS <b>preflight</b> (<code>OPTIONS</code>) call?',
+        opts: ['A simple <code>GET</code> with no custom headers', 'A <code>PUT</code>/<code>DELETE</code>, or a request with a custom header or <code>Content-Type: application/json</code>', 'Any <code>GET</code>', 'Only same-origin requests'], correct: 1,
+        exp: 'Non-simple requests (methods beyond GET/POST/HEAD, custom headers, or JSON content-type) make the browser send an <code>OPTIONS</code> preflight to check permissions first.'
+      },
+      {
+        g: "MongoDB & Mongoose",
+        q: 'In an aggregation pipeline, what does <code>$lookup</code> do?',
+        opts: ['Creates an index', 'Performs a left outer join to another collection', 'Deletes matching docs', 'Sorts results'], correct: 1,
+        exp: '<code>$lookup</code> joins documents from another collection (left outer join), embedding matches as an array — MongoDB\'s way of relating collections at query time.'
+      },
+      {
+        g: "MongoDB & Mongoose",
+        q: 'With a compound index <code>{ status: 1, createdAt: 1 }</code>, which query can it efficiently serve?',
+        opts: ['Only <code>{ createdAt }</code>', '<code>{ status }</code> alone, or <code>{ status, createdAt }</code> — but NOT <code>{ createdAt }</code> alone', 'Any single-field query', 'None — compound indexes go unused'], correct: 1,
+        exp: 'A compound index works left-to-right (prefix rule): it serves <code>status</code>, or <code>status + createdAt</code>, but not <code>createdAt</code> by itself.'
+      },
+      {
+        g: "MongoDB & Mongoose",
+        q: 'What does Mongoose <code>.lean()</code> return, and why use it?',
+        opts: ['Full Mongoose documents, slower', 'Plain JS objects (no getters/virtuals/methods) — faster, lower memory for read-only queries', 'A cursor you must iterate', 'Only the _id field'], correct: 1,
+        exp: '<code>.lean()</code> skips hydrating full documents and returns plain objects — great for read-only endpoints, but you lose virtuals, instance methods, and change tracking.'
+      },
+      {
+        g: "MongoDB & Mongoose",
+        q: 'Multi-document ACID transactions in MongoDB require…',
+        opts: ['Nothing special', 'A replica set (or sharded cluster) and a session', 'A relational plugin', 'Disabling indexes'], correct: 1,
+        exp: 'Transactions use sessions and need a replica set (a standalone <code>mongod</code> can\'t do them). Wrap operations in <code>session.withTransaction(...)</code>.'
+      },
+      {
+        g: "Auth & Security",
+        q: 'Why are stateless JWTs hard to revoke before they expire?',
+        opts: ['They are encrypted', 'The server stores no session, so a valid unexpired token is trusted — you need a blocklist or short expiry + refresh tokens', 'They never expire', 'The client controls expiry'], correct: 1,
+        exp: 'Nothing is stored server-side, so a stolen token works until <code>exp</code>. Mitigations: short-lived access tokens + refresh rotation, or a server-side token/blocklist check.'
+      },
+      {
+        g: "Auth & Security",
+        q: 'A login runs <code>User.findOne({ email: req.body.email })</code> and an attacker sends <code>email: { "$gt": "" }</code>. The risk?',
+        opts: ['Nothing', 'NoSQL injection — the object is treated as a query operator and can bypass logic; validate input types', 'It crashes MongoDB', 'It leaks the schema'], correct: 1,
+        exp: 'Passing raw request objects into queries lets attackers inject operators like <code>$gt</code>/<code>$ne</code>. Validate/cast inputs (ensure <code>email</code> is a string) or use Zod/Joi.'
+      },
+      {
+        g: "Auth & Security",
+        q: 'Storing a JWT in <code>localStorage</code> (vs an httpOnly cookie) mainly exposes it to…',
+        opts: ['CSRF', 'XSS — any injected script can read <code>localStorage</code> and steal the token', 'SQL injection', 'Rate limiting'], correct: 1,
+        exp: '<code>localStorage</code> is readable by JavaScript, so an XSS payload can exfiltrate the token. httpOnly cookies aren\'t readable by JS (but need CSRF protection).'
+      },
+      {
+        g: "Auth & Security",
+        q: 'Why compare secrets/tokens with <code>crypto.timingSafeEqual</code> instead of <code>===</code>?',
+        opts: ['It\'s faster', 'It runs in constant time, preventing timing attacks that infer the value from response speed', 'It hashes the input', 'It\'s required by JWT'], correct: 1,
+        exp: '<code>===</code> can short-circuit on the first differing byte, leaking info via timing. <code>timingSafeEqual</code> always takes the same time, defeating timing side-channels.'
+      },
+
+      // ===== EXAM GAP DRILL (from your real exam mistakes) =====
+      {
+        g: "Node.js Core",
+        q: 'In an ES Module, which line is a <b>default</b> import of the whole <code>fs</code> module?',
+        opts: ['<code>import { fs } from "fs"</code>', '<code>import fs from "fs"</code>', '<code>const fs = import("fs")</code>', '<code>require fs from "fs"</code>'], correct: 1,
+        exp: '<code>import fs from "fs"</code> is a default import (binds the module\'s whole/default export). <code>import { readFile } from "fs"</code> is a <b>named</b> import — curly braces = named.'
+      },
+      {
+        g: "Node.js Core",
+        q: 'What is the standard Node callback signature (the "error-first" convention)?',
+        opts: ['<code>(data, err)</code>', '<code>(err, data)</code>', '<code>(data)</code>', '<code>(res, err)</code>'], correct: 1,
+        exp: 'Node callbacks are <b>error-first</b>: <code>(err, data)</code>. Always check <code>if (err)</code> before using <code>data</code>.'
+      },
+      {
+        g: "Node.js Core",
+        q: 'Difference between <code>fs.appendFile</code> and <code>fs.writeFile</code>?',
+        opts: ['They are identical', '<code>appendFile</code> adds to the end (creating the file if missing); <code>writeFile</code> overwrites the whole file', '<code>appendFile</code> is synchronous only', '<code>writeFile</code> cannot create files'], correct: 1,
+        exp: '<code>appendFile</code> appends (and creates the file if it doesn\'t exist); <code>writeFile</code> replaces the entire contents.'
+      },
+      {
+        g: "Express.js",
+        q: 'How do you create a modular, mountable set of routes in Express?',
+        opts: ['<code>express.json()</code>', '<code>express.Router()</code>', '<code>new express.Route()</code>', '<code>app.router()</code>'], correct: 1,
+        exp: '<code>const router = express.Router()</code> creates a mini-app of routes you export and mount. <code>express.json()</code> is the body parser — a different thing (a common mix-up).'
+      },
+      {
+        g: "Express.js",
+        q: 'What does <code>app.use("/api/users", userRouter)</code> do?',
+        opts: ['Runs userRouter on every route', 'Mounts userRouter under the <code>/api/users</code> path prefix', 'Redirects to /api/users', 'Creates the router'], correct: 1,
+        exp: 'It mounts the router at a path prefix — <code>router.get("/")</code> becomes <code>GET /api/users</code>. Pass the router <b>variable</b>, not <code>Router()</code> itself.'
+      },
+      {
+        g: "MongoDB & Mongoose",
+        q: 'How do you turn a schema into a usable model?',
+        opts: ['<code>mongoose.create("User", schema)</code>', '<code>mongoose.model("User", schema)</code>', '<code>mongoose.join("User", schema)</code>', '<code>new schema("User")</code>'], correct: 1,
+        exp: '<code>mongoose.model("User", userSchema)</code> compiles the schema into a model with query methods (<code>find</code>, <code>findOne</code>, <code>create</code>...). There is no <code>mongoose.create</code> or <code>mongoose.join</code>.'
+      },
+      {
+        g: "Express.js",
+        q: 'For <code>GET /products?page=2</code>, what is the type of <code>req.query.page</code>?',
+        opts: ['Number <code>2</code>', 'String <code>"2"</code>', 'Boolean', 'undefined'], correct: 1,
+        exp: 'Query-string values are <b>always strings</b> — <code>req.query.page</code> is <code>"2"</code>. Convert with <code>Number(req.query.page)</code> before doing math.'
+      },
+      {
+        g: "REST API Design",
+        q: 'The correct offset (skip) formula for page-based pagination is…',
+        opts: ['<code>page * limit</code>', '<code>(page - 1) * limit</code>', '<code>page / limit</code>', '<code>limit - page</code>'], correct: 1,
+        exp: '<code>skip = (page - 1) * limit</code>. Page 1 → skip 0; page 2 with limit 10 → skip 10. Then <code>.skip(skip).limit(limit)</code>.'
+      },
+
+      // ===== HARDER — exam-style API recall (all 7 Figma sections) =====
+      {
+        g: "MongoDB & Mongoose",
+        q: 'You want <code>findByIdAndUpdate</code> to return the <b>updated</b> doc AND run schema validators. Correct options?',
+        opts: ['<code>{ new: true }</code> only', '<code>{ new: true, runValidators: true }</code>', '<code>{ updated: true, validate: true }</code>', 'No options needed — both happen by default'], correct: 1,
+        exp: 'By default <code>findByIdAndUpdate</code> returns the <b>old</b> doc and <b>skips</b> validators. Pass <code>{ new: true, runValidators: true }</code> to get the updated document and enforce schema rules.'
+      },
+      {
+        g: "MongoDB & Mongoose",
+        q: 'In an aggregation pipeline, for best performance where should <code>$match</code> go relative to <code>$group</code>?',
+        opts: ['After <code>$group</code>', 'Before <code>$group</code> — filter first so fewer docs are grouped', 'Order does not matter', 'Inside <code>$group</code>'], correct: 1,
+        exp: 'Put <code>$match</code> as early as possible (before <code>$group</code>/<code>$sort</code>) so fewer documents are processed and indexes can be used. Filtering after grouping wastes work.'
+      },
+      {
+        g: "MongoDB & Mongoose",
+        q: 'Which atomically increments a document\'s <code>views</code> field by 1?',
+        opts: ['<code>doc.views++; doc.save()</code>', '<code>updateOne({_id}, { $inc: { views: 1 } })</code>', '<code>updateOne({_id}, { views: "+1" })</code>', '<code>updateOne({_id}, { $add: { views: 1 } })</code>'], correct: 1,
+        exp: '<code>$inc</code> performs an atomic in-database increment (no read-modify-write race). Read-then-save can lose concurrent updates; <code>$add</code> is an aggregation operator, not an update one.'
+      },
+      {
+        g: "Auth & Security",
+        q: 'To confirm a JWT is authentic (signature valid, not expired), which do you call?',
+        opts: ['<code>jwt.decode(token)</code>', '<code>jwt.verify(token, secret)</code>', '<code>jwt.read(token, secret)</code>', '<code>jwt.parse(token)</code>'], correct: 1,
+        exp: '<code>jwt.verify</code> checks the signature + expiry and throws if invalid. <code>jwt.decode</code> only reads the payload <b>without verifying</b> — never trust it for auth.'
+      },
+      {
+        g: "Auth & Security",
+        q: 'Which correctly signs a token that expires in 1 hour?',
+        opts: ['<code>jwt.sign(payload, secret, { expiresIn: "1h" })</code>', '<code>jwt.sign(payload, { expiresIn: "1h" }, secret)</code>', '<code>jwt.create(payload, secret, "1h")</code>', '<code>jwt.encode(payload, secret, { exp: "1h" })</code>'], correct: 0,
+        exp: 'Signature is <code>jwt.sign(payload, secret, options)</code> — secret is the <b>second</b> arg, options third. <code>jwt.create/encode</code> don\'t exist on <code>jsonwebtoken</code> (only <code>sign</code>, <code>verify</code>, <code>decode</code>).'
+      },
+      {
+        g: "Express.js",
+        q: 'After <code>upload.single("avatar")</code> runs, where is the uploaded file?',
+        opts: ['<code>req.files</code>', '<code>req.file</code>', '<code>req.body.avatar</code>', '<code>req.avatar</code>'], correct: 1,
+        exp: '<code>single</code> puts one file on <code>req.file</code> (singular). <code>upload.array()</code> uses <code>req.files</code> (plural). Text fields still arrive on <code>req.body</code>.'
+      },
+      {
+        g: "Express.js",
+        q: 'You need the uploaded file as a Buffer in <code>req.file.buffer</code> (e.g. to stream to S3). Which Multer storage?',
+        opts: ['<code>multer.diskStorage(...)</code>', '<code>multer.memoryStorage()</code>', '<code>multer.buffer()</code>', '<code>multer({ dest: "uploads/" })</code>'], correct: 1,
+        exp: '<code>memoryStorage()</code> keeps the file in RAM and exposes <code>req.file.buffer</code>. <code>diskStorage</code>/<code>dest</code> write to disk and give you <code>req.file.path</code> instead.'
+      },
+      {
+        g: "Node.js Core",
+        q: 'You call 3 mirrors and want the first that <b>succeeds</b>, ignoring ones that reject. Use…',
+        opts: ['<code>Promise.race</code>', '<code>Promise.any</code>', '<code>Promise.all</code>', '<code>Promise.allSettled</code>'], correct: 1,
+        exp: '<code>Promise.any</code> resolves with the first <b>fulfilled</b> value and ignores rejections (rejects only if all fail). <code>Promise.race</code> settles on the first to finish — even if it\'s a rejection.'
+      },
+
+      {
+        g: "Telegram Bot",
+        q: 'In Telegraf, how do you handle the <code>/help</code> command?',
+        opts: ['<code>bot.on("help", ctx => ...)</code>', '<code>bot.command("help", ctx => ctx.reply("..."))</code>', '<code>bot.hears("help", ctx => ...)</code>', '<code>bot.command("/help", ctx => ...)</code>'], correct: 1,
+        exp: '<code>bot.command("help", ...)</code> registers a slash-command handler (name <b>without</b> the slash). <code>bot.hears</code> matches arbitrary text; <code>bot.on("help")</code> isn\'t a valid update type.'
+      },
+      {
+        g: "Telegram Bot",
+        q: 'Inside a handler <code>(ctx) => {...}</code>, how do you send a text reply?',
+        opts: ['<code>ctx.send("Hi")</code>', '<code>ctx.reply("Hi")</code>', '<code>bot.reply("Hi")</code>', '<code>ctx.message.reply("Hi")</code>'], correct: 1,
+        exp: '<code>ctx.reply("Hi")</code> sends a message to the current chat. <code>ctx.send</code>/<code>bot.reply</code> aren\'t Telegraf methods.'
+      },
+      {
+        g: "Telegram Bot",
+        q: 'Which starts the bot with long polling?',
+        opts: ['<code>bot.start()</code>', '<code>bot.launch()</code>', '<code>bot.run()</code>', '<code>bot.listen(3000)</code>'], correct: 1,
+        exp: '<code>bot.launch()</code> connects and begins receiving updates. <code>bot.start()</code> is a handler for the <code>/start</code> command, not a launcher.'
+      },
+      {
+        g: "Telegram Bot",
+        q: 'How do you read the incoming text of a message?',
+        opts: ['<code>ctx.text</code>', '<code>ctx.message.text</code>', '<code>ctx.body</code>', '<code>req.message.text</code>'], correct: 1,
+        exp: 'The update lives on <code>ctx.message</code>; its text is <code>ctx.message.text</code>. There is no <code>req</code> in a Telegraf handler.'
+      },
+      {
+        g: "Telegram Bot",
+        q: 'Run a handler for <b>every</b> text message regardless of content?',
+        opts: ['<code>bot.command("text", ...)</code>', '<code>bot.on("text", ctx => ...)</code>', '<code>bot.hears("*", ...)</code>', '<code>bot.every("text", ...)</code>'], correct: 1,
+        exp: '<code>bot.on("text", ...)</code> fires for all text updates. <code>bot.hears</code> needs a pattern to match; <code>bot.command</code> only fires on slash-commands.'
+      },
+      {
+        g: "Telegram Bot",
+        q: 'Which builds an <b>inline</b> keyboard (buttons attached under a message)?',
+        opts: ['<code>Markup.keyboard([...])</code>', '<code>Markup.inlineKeyboard([Markup.button.callback("Yes", "y")])</code>', '<code>bot.inlineKeyboard([...])</code>', '<code>ctx.keyboard([...])</code>'], correct: 1,
+        exp: '<code>Markup.inlineKeyboard([...])</code> with <code>Markup.button.callback(text, data)</code> builds inline buttons. <code>Markup.keyboard</code> makes a reply (custom) keyboard — a different thing.'
+      },
+      {
+        g: "Telegram Bot",
+        q: 'A user taps an inline button with callback data <code>"buy"</code>. How do you handle it?',
+        opts: ['<code>bot.command("buy", ...)</code>', '<code>bot.action("buy", ctx => ctx.answerCbQuery())</code>', '<code>bot.on("buy", ...)</code>', '<code>bot.hears("buy", ...)</code>'], correct: 1,
+        exp: 'Inline-button presses are callback queries → <code>bot.action("buy", ...)</code>. Call <code>ctx.answerCbQuery()</code> to stop the loading spinner. <code>command</code>/<code>hears</code> handle commands/text, not callbacks.'
+      },
+
+      {
+        g: "FullStack",
+        q: 'Enable CORS for all origins in Express?',
+        opts: ['<code>app.use(helmet())</code>', '<code>app.use(cors())</code>', '<code>app.enableCors()</code>', '<code>app.use(express.cors())</code>'], correct: 1,
+        exp: 'The <code>cors</code> package: <code>app.use(cors())</code>. <code>app.enableCors()</code> is NestJS; there is no <code>express.cors()</code>; <code>helmet</code> sets security headers, not CORS.'
+      },
+      {
+        g: "FullStack",
+        q: 'Set a cookie that JavaScript on the client can\'t read?',
+        opts: ['<code>res.cookie("t", v, { httpOnly: true })</code>', '<code>res.setCookie("t", v)</code>', '<code>res.header("Cookie", v)</code>', '<code>res.cookies.set("t", v)</code>'], correct: 0,
+        exp: '<code>res.cookie(name, value, { httpOnly: true })</code> sends a Set-Cookie the browser stores but JS can\'t read (XSS mitigation). The other names don\'t exist on Express <code>res</code>.'
+      },
+      {
+        g: "FullStack",
+        q: 'To read incoming cookies via <code>req.cookies</code>, which middleware do you add?',
+        opts: ['<code>app.use(express.cookies())</code>', '<code>app.use(cookieParser())</code>', '<code>app.use(bodyParser.cookie())</code>', '<code>req.parseCookies()</code>'], correct: 1,
+        exp: 'The <code>cookie-parser</code> middleware — <code>app.use(cookieParser())</code> — populates <code>req.cookies</code>. Express has no built-in <code>express.cookies()</code>.'
+      },
+      {
+        g: "FullStack",
+        q: 'On a host like Render/Railway, how should your server pick its port?',
+        opts: ['Hardcode <code>app.listen(3000)</code>', '<code>app.listen(process.env.PORT || 3000)</code>', '<code>app.listen(env.PORT)</code>', '<code>app.listen(process.PORT)</code>'], correct: 1,
+        exp: 'The platform injects the port via <code>process.env.PORT</code>; fall back to 3000 locally. Hardcoding breaks deployment; <code>process.PORT</code>/<code>env.PORT</code> are wrong references.'
+      },
+      {
+        g: "FullStack",
+        q: 'Which loads variables from a <code>.env</code> file into <code>process.env</code>?',
+        opts: ['<code>require("dotenv").config()</code>', '<code>dotenv.load()</code>', '<code>require("env").config()</code>', '<code>process.loadEnv()</code>'], correct: 0,
+        exp: '<code>require("dotenv").config()</code> (called once, early) reads <code>.env</code> into <code>process.env</code>. The others aren\'t real APIs.'
+      },
+      {
+        g: "FullStack",
+        q: 'Your frontend must send cookies to an API on another origin. What\'s required?',
+        opts: ['Nothing — cookies always cross origins', 'Server: <code>cors({ origin, credentials: true })</code> AND client: <code>fetch(url, { credentials: "include" })</code>', 'Only <code>app.use(cors())</code>', 'Set <code>Access-Control-Allow-Origin: *</code>'], correct: 1,
+        exp: 'Cross-origin cookies need <b>both</b> sides: the server allows credentials for a specific origin, and the client opts in with <code>credentials:"include"</code>. Note <code>origin:"*"</code> is <b>not allowed</b> together with credentials.'
+      }
+    ];
+
+    // ---------------- Practical answer keys ----------------
+    function norm(s) { return (s || '').trim().replace(/^["'`]+|["'`]+$/g, '').replace(/\s+/g, ' '); }
+    const PRACTICALS = {
+      1: [['Bearer'], ['split'], ['401'], ['verify'], ['next']],
+      2: [['hash'], ['12'], ['compare']],
+      3: [['catch'], ['findById'], ['404'], ['json']],
+      4: [['Schema'], ['required'], ['enum'], ['Number'], ['timestamps']],
+      5: [['events'], ['EventEmitter'], ['on'], ['emit']],
+      6: [['async'], ['await'], ['all']],
+      7: [['createServer'], ['writeHead'], ['end'], ['listen']],
+      8: [['includes'], ['403'], ['next']],
+      9: [['fs'], ['appendFile'], ['err']],
+      10: [['Router'], ['json'], ['use']],
+      11: [['Schema'], ['hash'], ['compare'], ['model'], ['findOne']],
+      12: [['Number'], ['Number'], ['limit'], ['limit']]
+    };
+    const PSOL = {
+      1: '<b>Bearer </b>(trailing space) · <b>split</b> · <b>401</b> · <b>verify</b> · <b>next</b>. Confirm the scheme with <code>startsWith("Bearer ")</code>, take the token via <code>split(" ")[1]</code>, block with 401 if missing, <code>jwt.verify</code> validates the signature (throws → caught 401), then attach <code>req.user</code> and call <code>next()</code>.',
+      2: '<b>hash</b> · <b>12</b> · <b>compare</b>. <code>bcrypt.hash(pw, 12)</code> salts + hashes at cost 12; <code>bcrypt.compare(candidate, hash)</code> re-derives the salt and returns a boolean. The <code>isModified</code> guard prevents double-hashing.',
+      3: '<b>catch</b> · <b>findById</b> · <b>404</b> · <b>json</b>. The wrapper forwards rejections with <code>.catch(next)</code>. <code>findById</code> returns null if absent → throw <code>AppError(...,404)</code>; success responds with <code>res.status(200).json(...)</code>.',
+      4: '<b>Schema</b> · <b>required</b> · <b>enum</b> · <b>Number</b> · <b>timestamps</b>. <code>new mongoose.Schema({...})</code>; <code>required:true</code> enforces presence; <code>enum</code> restricts allowed values; <code>type:Number</code> with <code>min</code>; <code>{timestamps:true}</code> adds createdAt/updatedAt.',
+      5: '<b>events</b> · <b>EventEmitter</b> · <b>on</b> · <b>emit</b>. Import the core <code>events</code> module, extend <code>EventEmitter</code>, register with <code>.on("message", cb)</code> and fire with <code>.emit("message", data)</code>.',
+      6: '<b>async</b> · <b>await</b> · <b>all</b>. Mark the function <code>async</code>, then <code>await Promise.all([...])</code> runs both calls <i>concurrently</i> and resolves when both finish (faster than awaiting sequentially).',
+      7: '<b>createServer</b> · <b>writeHead</b> · <b>end</b> · <b>listen</b>. <code>http.createServer((req,res)=>{...})</code>; <code>res.writeHead(200, headers)</code> sets status + headers; <code>res.end(body)</code> sends the response; <code>server.listen(3000)</code> starts it.',
+      8: '<b>includes</b> · <b>403</b> · <b>next</b>. Check <code>roles.includes(req.user.role)</code>; if not allowed, <code>next(new AppError("Forbidden", 403))</code>; otherwise call <code>next()</code> to proceed.'
+    };
+    const PRACTICAL_IDS = Object.keys(PRACTICALS);
+
+    // ---------------- Uzbek translations (parallel to QUESTIONS by index) ----------------
+    const UZ = [
+      {
+        q: 'Konsoldagi chiqish tartibi aniq qanday bo‘ladi?<pre><span class="cmt">console.log("A");</span>\nsetTimeout(() => console.log("B"), 0);\nPromise.resolve().then(() => console.log("C"));\nprocess.nextTick(() => console.log("D"));\nconsole.log("E");</pre>',
+        opts: ['A E D C B', 'A E C D B', 'A B C D E', 'A E B C D'],
+        exp: 'Avval sinxron kod: <b>A, E</b>. Keyin mikrotasklar — <code>process.nextTick</code> Promise navbatidan oldin bajariladi: <b>D</b>, so‘ng <b>C</b>. Eng oxirida timer (makrotask): <b>B</b>.'
+      },
+      {
+        q: 'CommonJS da moduldan qiymatni qanday eksport qilasiz?',
+        opts: ['<code>export default value</code>', '<code>module.exports = value</code>', '<code>exports value</code>', '<code>return value</code>'],
+        exp: 'CommonJS (Node standarti) <code>module.exports = ...</code> va <code>require()</code> dan foydalanadi. <code>export default</code> — bu ES-modul sintaksisi.'
+      },
+      {
+        q: 'Web-serverda <code>const data = fs.readFileSync("big.txt")</code> ning nimasi yomon?',
+        opts: ['Katta fayllarda xato beradi', 'U event loop ni bloklaydi va tugaguncha boshqa so‘rovlar ishlamaydi', 'Matnli fayllarni o‘qiy olmaydi', 'Hech nima — bu tavsiya etilgan usul'],
+        exp: 'Sinxron I/O yagona JS oqimini bloklaydi, u ishlayotganda boshqa so‘rov bajarilmaydi. Serverda asinxron <code>fs.readFile</code> / <code>fs.promises</code> dan foydalaning.'
+      },
+      {
+        q: '<code>node app.js hello world</code> uchun <code>process.argv[2]</code> nima?',
+        opts: ['<code>"app.js"</code>', '<code>"node"</code>', '<code>"hello"</code>', '<code>"world"</code>'],
+        exp: '<code>argv[0]</code> — node yo‘li, <code>argv[1]</code> — skript yo‘li, shuning uchun birinchi haqiqiy argument <code>argv[2]</code> → <code>"hello"</code>.'
+      },
+      {
+        q: 'Katta faylni nega <code>fs.readFile</code> emas, <b>stream</b> bilan o‘qigan ma’qul?',
+        opts: ['Streamlar doim tezroq', 'Stream ma’lumotni bo‘laklab qayta ishlaydi, faylni butunlay xotiraga yuklamaydi', 'Stream faylni siqadi', 'readFile katta fayllarni o‘qiy olmaydi'],
+        exp: 'Stream <code>data</code> hodisalarini bo‘laklarda chiqaradi, butun fayl xotirada saqlanmaydi — katta fayllar va backpressure uchun zarur.'
+      },
+      {
+        q: 'Node.js <code>Buffer</code> nima?',
+        opts: ['UTF-8 satr o‘ramchisi', 'V8 heap tashqarisidagi belgilangan uzunlikdagi xom binar ma’lumot', 'Log navbati', 'Promise turi'],
+        exp: '<code>Buffer</code> — belgilangan uzunlikdagi xom binar xotira; fayl, tarmoq va crypto baytlari uchun, satrga aylantirishdan oldin ishlatiladi.'
+      },
+      {
+        q: '<code>__dirname</code> nimani beradi?',
+        opts: ['Joriy ishchi papka (node ishga tushirilgan joy)', 'Joriy modul fayli joylashgan papkaning absolyut yo‘li', 'Foydalanuvchi uy papkasi', 'Har doim loyiha ildizi'],
+        exp: '<code>__dirname</code> — joriy fayl papkasi. <code>process.cwd()</code> esa node ishga tushirilgan joy — ular ko‘pincha farq qiladi.'
+      },
+      {
+        q: '<code>EventEmitter</code> da qaysi juftlik to‘g‘ri?',
+        opts: ['<code>.subscribe()</code> ro‘yxatga oladi, <code>.publish()</code> chaqiradi', '<code>.on()</code> tinglovchini ro‘yxatga oladi, <code>.emit()</code> uni ishga tushiradi', '<code>.listen()</code> ro‘yxatga oladi, <code>.send()</code> chaqiradi', '<code>.then()</code> ro‘yxatga oladi, <code>.resolve()</code> chaqiradi'],
+        exp: 'Tinglovchilarni <code>.on(event, cb)</code> bilan ro‘yxatga olasiz va <code>.emit(event, ...args)</code> bilan sinxron chaqirasiz.'
+      },
+      {
+        q: 'Nega <code>path.join(__dirname, "data", "f.txt")</code> satrlarni qo‘shishdan afzal?',
+        opts: ['Qisqaroq', 'U ajratgichlarni normallashtiradi va turli OS (Windows/POSIX) yo‘llarini to‘g‘ri boshqaradi', 'Yo‘lni keshlaydi', 'Faylni ham o‘qiydi'],
+        exp: '<code>path.join</code> to‘g‘ri OS ajratgichidan foydalanadi va ortiqcha chiziqlarni yig‘ishtiradi, platformalararo yo‘llar buzilishining oldini oladi.'
+      },
+      {
+        q: 'Foydalanuvchi parollarini saqlash uchun qaysi biri to‘g‘ri?',
+        opts: ['<code>crypto.createHash("md5")</code>', 'Bitta <code>sha256</code> hash', '<code>bcrypt</code> (yoki argon2) salt va cost faktor bilan', 'Base64 kodlash'],
+        exp: 'Tez hashlar (md5/sha256) tuzsiz va oson buziladi. <b>bcrypt</b>/argon2 ataylab sekin va saltli — parollar uchun mo‘ljallangan.'
+      },
+      {
+        q: '<code>child_process.spawn</code> va <code>exec</code> orasidagi farq?',
+        opts: ['Ular bir xil', '<code>spawn</code> chiqishni stream qiladi (katta/uzoq chiqish uchun); <code>exec</code> butun chiqishni xotiraga buferlaydi', '<code>exec</code> asinxron, <code>spawn</code> sinxron', '<code>spawn</code> argument uzata olmaydi'],
+        exp: '<code>spawn</code> stream interfeysini qaytaradi (katta chiqish uchun yaxshi); <code>exec</code> stdout/stderr ni callbackka buferlaydi (soddaroq, lekin xotira bilan cheklangan).'
+      },
+      {
+        q: '<code>process.on("uncaughtException", ...)</code> nima qilishga imkon beradi?',
+        opts: ['Barcha xatolarni abadiy xavfsiz e’tiborsiz qoldirish', 'Yuqoriga ko‘tarilgan sinxron xatoni ushlash — odatda uni log qilib, jarayondan chiqish', 'Xato bergan funksiyani avtomatik qayta urinish', 'Xatolarni ogohlantirishga aylantirish'],
+        exp: 'Bu — ushlanmagan sinxron xatolar uchun oxirgi chora. Eng yaxshi amaliyot: log qiling, minimal tozalash, so‘ng <code>process.exit(1)</code> — jarayon holati ishonchsiz.'
+      },
+      {
+        q: 'Express da to‘g‘ri middleware imzosi qaysi?',
+        opts: ['<code>(req, res)</code>', '<code>(req, res, next)</code>', '<code>(next, req, res)</code>', '<code>(err, req)</code>'],
+        exp: 'Oddiy middleware — <code>(req, res, next)</code>; davom etish uchun <code>next()</code> chaqirilishi yoki javob yuborilishi kerak.'
+      },
+      {
+        q: 'Middleware hech qachon <code>next()</code> chaqirmasa va javob yubormasa nima bo‘ladi?',
+        opts: ['Express uni qayta chaqiradi', 'So‘rov timeout bo‘lguncha osilib qoladi — javob yuborilmaydi', 'Avtomatik 404 qaytaradi', 'Server qulaydi'],
+        exp: 'So‘rov quvurda tiqilib qoladi. <code>next()</code> (yoki javob) ni unutish — osilib qolgan so‘rovlarning klassik sababi.'
+      },
+      {
+        q: 'Nega <code>app.use(express.json())</code> <code>req.body</code> o‘qiydigan route lardan oldin bo‘lishi kerak?',
+        opts: ['Aks holda Express ishga tushishda xato beradi', 'Middleware tartib bo‘yicha ishlaydi; parser oldin bo‘lmasa <code>req.body</code> undefined bo‘ladi', 'U javob turini o‘rnatadi', 'Faqat GET uchun kerak'],
+        exp: 'Middleware yuqoridan pastga ishlaydi. Body parser handler ishlashidan oldin <code>req.body</code> ni to‘ldirishi shart.'
+      },
+      {
+        q: 'Express xatolarni boshqaruvchi (error-handling) middleware ni qanday taniydi?',
+        opts: ['<code>app.error()</code> bilan ro‘yxatga olinadi', 'Uning to‘rtta parametri bor: <code>(err, req, res, next)</code>', 'U Promise qaytaradi', 'Nomi errorHandler bo‘ladi'],
+        exp: 'Aniqlash <b>parametrlar soni</b> bo‘yicha — to‘rtta argument <code>(err, req, res, next)</code> — va u eng oxirida ro‘yxatga olinishi kerak.'
+      },
+      {
+        q: '<code>/users/:id</code> route bilan <code>GET /users/5</code> da <code>5</code> qiymati qayerdan olinadi?',
+        opts: ['<code>req.query.id</code>', '<code>req.body.id</code>', '<code>req.params.id</code>', '<code>req.headers.id</code>'],
+        exp: 'Nomlangan route bo‘laklari (<code>:id</code>) <code>req.params</code> da bo‘ladi. Query qiymatlari esa <code>req.query</code> da.'
+      },
+      {
+        q: '<code>GET /products?sort=price&limit=10</code> da <code>sort</code> ni qanday o‘qiysiz?',
+        opts: ['<code>req.params.sort</code>', '<code>req.query.sort</code>', '<code>req.body.sort</code>', '<code>req.sort</code>'],
+        exp: '<code>?</code> dan keyingi hamma narsa query satri bo‘lib, <code>req.query</code> ga parse qilinadi.'
+      },
+      {
+        q: '<code>app.use(express.static("public"))</code> nima qiladi?',
+        opts: ['Barcha javoblarni keshlaydi', '<code>public</code> papkadagi fayllarni to‘g‘ridan-to‘g‘ri URL ildizida uzatadi', 'Statik fayllarni bloklaydi', 'CSS/JS ni minify qiladi'],
+        exp: 'U statik fayllarni uzatadi — <code>public/logo.png</code> <code>/logo.png</code> manzilida ochiladi.'
+      },
+      {
+        q: '<code>res.json(obj)</code> <code>res.send(obj)</code> dan nimasi bilan farq qiladi?',
+        opts: ['Sekinroq', '<code>Content-Type: application/json</code> ni o‘rnatadi va <code>JSON.stringify</code> bilan izchil seriyalaydi', 'Faqat massivlar bilan ishlaydi', 'Autentifikatsiya qo‘shadi'],
+        exp: '<code>res.json</code> JSON content-type va stringify ni kafolatlaydi; <code>res.send</code> esa turni argumentdan taxmin qiladi.'
+      },
+      {
+        q: 'Route fayl boshidagi <code>router.use(protect)</code> nimani anglatadi?',
+        opts: ['Faqat birinchi route himoyalanadi', 'Shu qatordan keyin aniqlangan har bir route auth talab qiladi', 'app.use ham chaqirilmaguncha hech narsa', 'Router ni o‘chiradi'],
+        exp: 'Router darajasidagi middleware o‘sha routerda undan keyin ro‘yxatga olingan barcha route larga qo‘llanadi — butun resursni himoyalashning toza usuli.'
+      },
+      {
+        q: '<code>const catchAsync = fn => (req,res,next) => Promise.resolve(fn(req,res,next)).catch(next);</code> o‘ramchisining maqsadi nima?',
+        opts: ['So‘rovlarni qayta urinish', 'Rad etilgan promise ni <code>next(err)</code> orqali Express xato middleware siga uzatish (try/catch siz)', 'Javoblarni keshlash', 'Body ni parse qilish'],
+        exp: 'Rad etilgan asinxron handler ushlab olinib <code>next</code> ga uzatiladi va global xato boshqaruvchiga yetadi — controllerlar shunchaki <code>throw</code> qilishi mumkin.'
+      },
+      {
+        q: 'Qaysi HTTP metodi <b>idempotent EMAS</b>?',
+        opts: ['<code>GET</code>', '<code>PUT</code>', '<code>POST</code>', '<code>DELETE</code>'],
+        exp: '<code>POST</code> har chaqiruvda yangi resurs yaratadi. GET/PUT/DELETE bir yoki ko‘p marta chaqirilsa ham bir xil holat beradi.'
+      },
+      {
+        q: 'Token to‘g‘ri, lekin foydalanuvchida ruxsat yo‘q — qaysi status?',
+        opts: ['<code>400</code>', '<code>401</code>', '<code>403</code>', '<code>422</code>'],
+        exp: '<b>401</b> = autentifikatsiyadan o‘tmagan; <b>403</b> = o‘tgan, lekin ruxsat yo‘q. Ruxsat yo‘qligi → 403.'
+      },
+      {
+        q: 'Resurs yaratadigan muvaffaqiyatli <code>POST /users</code> nimani qaytaradi?',
+        opts: ['<code>200 OK</code>', '<code>201 Created</code>', '<code>204 No Content</code>', '<code>202 Accepted</code>'],
+        exp: '<b>201 Created</b> yangi resurs yaratilganini bildiradi, ideal holda uning ko‘rinishi va <code>Location</code> header bilan.'
+      },
+      {
+        q: 'Javob tanasi bo‘lmagan muvaffaqiyatli <code>DELETE</code> qaysi statusdan foydalanishi kerak?',
+        opts: ['bo‘sh obyekt bilan <code>200</code>', '<code>201</code>', '<code>204 No Content</code>', '<code>202</code>'],
+        exp: '<b>204 No Content</b> = muvaffaqiyat, ataylab bo‘sh tana — DELETE uchun ideal.'
+      },
+      {
+        q: 'Allaqachon mavjud email bilan ro‘yxatdan o‘tish nimani qaytarishi kerak?',
+        opts: ['<code>400</code>', '<code>404</code>', '<code>409 Conflict</code>', '<code>500</code>'],
+        exp: 'Takrorlanuvchi resurs konflikti — <b>409</b>: so‘rov to‘g‘ri, lekin joriy holatga zid.'
+      },
+      {
+        q: '<code>PUT</code> va <code>PATCH</code> orasidagi asosiy farq?',
+        opts: ['PUT o‘qiydi, PATCH yozadi', 'PUT butun resursni almashtiradi; PATCH qisman yangilaydi', 'Ular bir xil', 'PATCH idempotent emas'],
+        exp: 'PUT to‘liq ko‘rinishni yuboradi (almashtirish); PATCH faqat o‘zgargan maydonlarni yuboradi (qisman). Ikkalasi ham idempotent.'
+      },
+      {
+        q: 'Bitta foydalanuvchini olishning RESTful usuli qaysi?',
+        opts: ['<code>POST /getUser?id=5</code>', '<code>GET /users/5</code>', '<code>GET /getUserById/5</code>', '<code>POST /users/fetch/5</code>'],
+        exp: 'REST otlar + HTTP metodlaridan foydalanadi: <code>GET /users/5</code>. URL dagi fe’llar (getUser) — RPC uslubi, REST emas.'
+      },
+      {
+        q: 'REST "stateless" (holatsiz) cheklovi nimani anglatadi?',
+        opts: ['Server hech qachon ma’lumot saqlamaydi', 'Har bir so‘rov kerakli barcha ma’lumotni o‘zida olib yuradi; server so‘rovlar orasida sessiya saqlamaydi', 'Javoblar hech qachon keshlanmaydi', 'Faqat GET ruxsat etiladi'],
+        exp: 'Holatsizlik: har bir so‘rov o‘zini ta’minlaydi (masalan, headerdagi token), shuning uchun istalgan server nusxasi uni bajara oladi — masshtablash uchun muhim.'
+      },
+      {
+        q: '<code>GET /products?sort=-price</code> odatda nimani anglatadi?',
+        opts: ['Narxi noldan past filtr', 'Narx bo‘yicha kamayish tartibida saralash (oldidagi minus = desc)', 'price maydonini chiqarib tashlash', 'Noto‘g‘ri sintaksis'],
+        exp: 'Keng tarqalgan kelishuv: <code>sort=price</code> o‘sish, <code>sort=-price</code> kamayish tartibida.'
+      },
+      {
+        q: 'So‘rovda majburiy maydon yetishmayapti. Eng mos status?',
+        opts: ['<code>400 Bad Request</code> (yoki 422)', '<code>401</code>', '<code>403</code>', '<code>500</code>'],
+        exp: 'Noto‘g‘ri/yetishmayotgan kirish — mijoz aybi → <b>400</b> (ba’zi API lar validatsiya uchun <b>422</b> ishlatadi). Foydalanuvchi xatosi uchun hech qachon 500 emas.'
+      },
+      {
+        q: 'Nega API ni <code>/api/v1/...</code> bilan versiyalash kerak?',
+        opts: ['SEO uchun', 'Buzuvchi o‘zgarishlar <code>/v2</code> da chiqadi, eski mijozlar esa <code>/v1</code> da ishlashda davom etadi', 'HTTP buni talab qiladi', 'Keshlashni yoqish uchun'],
+        exp: 'Versiyalash mavjud iste’molchilarni buzmasdan kontraktni rivojlantirish imkonini beradi — ular ko‘chguncha v1 da qoladi.'
+      },
+      {
+        q: 'Mongoose eng yaxshi qanday ta’riflanadi?',
+        opts: ['SQL query builder', 'MongoDB ustiga sxema, validatsiya va middleware qo‘shuvchi ODM', 'Kesh qatlami', 'REST framework'],
+        exp: 'Mongoose — <b>Object Document Mapper</b>: MongoDB hujjatlarini sxema, validatsiya, hook va yordamchilar bilan modellashtiradi.'
+      },
+      {
+        q: '<code>password: { type:String, select:false }</code> nimani anglatadi?',
+        opts: ['Parol hech qachon saqlanmaydi', 'Parol so‘rov natijalaridan chiqariladi, agar <code>.select("+password")</code> qo‘shmasangiz', 'Parol faqat o‘qish uchun bo‘ladi', 'Parol avtomatik hashlanadi'],
+        exp: '<code>select:false</code> maydonni sukut bo‘yicha natijadan yashiradi; loginda <code>.select("+password")</code> bilan qaytarib qo‘shasiz.'
+      },
+      {
+        q: 'Loginda yashirin parol kerak. To‘g‘ri so‘rov qaysi?',
+        opts: ['<code>User.findOne({email})</code>', '<code>User.findOne({email}).select("+password")</code>', '<code>User.findOne({email}).hidden()</code>', '<code>User.findOne({email}).lean()</code>'],
+        exp: 'Maydon <code>select:false</code> bo‘lgani uchun uni <code>.select("+password")</code> bilan aniq qo‘shishingiz kerak.'
+      },
+      {
+        q: '<code>{ timestamps: true }</code> sxemaga nima qo‘shadi?',
+        opts: ['Versiya kaliti', 'Avtomatik <code>createdAt</code> va <code>updatedAt</code> maydonlari', 'TTL index', 'Unik id'],
+        exp: 'Mongoose har bir save/update da <code>createdAt</code> va <code>updatedAt</code> ni avtomatik boshqaradi.'
+      },
+      {
+        q: '<code>pre("save")</code> hookida nega <code>if (!this.isModified("password")) return next();</code> tekshiruvi kerak?',
+        opts: ['Bo‘sh saqlashlarni o‘tkazib yuborish', 'Boshqa maydonlar o‘zgarganda allaqachon hashlangan parolni qayta hashlamaslik', 'Takroriy emaillarning oldini olish', 'Uzunlikni tekshirish'],
+        exp: 'Tekshiruvsiz istalgan maydonni yangilash allaqachon hashlangan parolni qayta hashlaydi va loginni butunlay buzadi.'
+      },
+      {
+        q: '<code>.populate("author")</code> nima qiladi?',
+        opts: ['author ni yaratadi', 'Saqlangan <code>author</code> ObjectId ni haqiqiy bog‘langan hujjat bilan almashtiradi', 'Yetim ref larni o‘chiradi', 'Index qo‘shadi'],
+        exp: 'Populate qo‘shimcha so‘rov bajarib, referens id ni bog‘langan kolleksiyadagi to‘liq hujjatga almashtiradi.'
+      },
+      {
+        q: 'Qaysi so‘rov 18 va undan katta yoshdagilarni qaytaradi?',
+        opts: ['<code>find({ age: ">=18" })</code>', '<code>find({ age: { $gte: 18 } })</code>', '<code>find({ age: 18+ })</code>', '<code>find({ age >= 18 })</code>'],
+        exp: 'MongoDB taqqoslash operatorlardan foydalanadi: <code>$gte</code> (≥), <code>$gt</code>, <code>$lte</code>, <code>$lt</code>, <code>$ne</code>, <code>$in</code>.'
+      },
+      {
+        q: 'Mos hujjat bo‘lmaganda <code>await User.findById("...")</code> nima qaytaradi?',
+        opts: ['NotFoundError tashlaydi', '<code>null</code> qaytaradi', 'Bo‘sh massiv qaytaradi', '<code>undefined</code> qaytarib log qiladi'],
+        exp: 'To‘g‘ri formatdagi, lekin mos kelmaydigan id <b>null</b> ga hal bo‘ladi — 404 ni o‘zingiz tekshirasiz. (Noto‘g‘ri id esa CastError tashlaydi.)'
+      },
+      {
+        q: 'Sxema maydonida <code>unique: true</code> o‘rnatish nima qiladi?',
+        opts: ['Saqlashdan oldin ishlaydigan Mongoose validator', 'MongoDB unik index yaratadi — takrorlar ValidationError emas, E11000 xato sifatida chiqadi', 'null qiymatlarni taqiqlaydi', 'Maydonni hashlaydi'],
+        exp: '<code>unique</code> — <b>validator emas</b>; u unik index quradi. Takrorlar Mongo <code>E11000</code> duplicate-key xatosini beradi va uni xato middleware da boshqarasiz.'
+      },
+      {
+        q: 'Sxema <code>methods</code> va <code>statics</code> funksiyalari orasidagi farq?',
+        opts: ['Farqi yo‘q', '<code>methods</code> hujjat nusxasida ishlaydi (<code>this</code> = hujjat); <code>statics</code> modelda ishlaydi (<code>this</code> = model)', 'statics faqat asinxron', 'methods this dan foydalana olmaydi'],
+        exp: '<code>schema.methods.x</code> → <code>doc.x()</code> (this = hujjat). <code>schema.statics.y</code> → <code>Model.y()</code> (this = model), masalan <code>User.findByEmail()</code>.'
+      },
+      {
+        q: 'Bir xil parolni bcrypt bilan ikki marta hashlash nima beradi?',
+        opts: ['Bir xil hashlar', 'Har xil hashlar — har biri yangi tasodifiy salt ni o‘z ichiga oladi', 'Faqat cost o‘zgarsa har xil', 'Faqat birinchi 22 belgi bir xil'],
+        exp: 'Har chaqiruvda tasodifiy salt har safar boshqa 60-belgili hash beradi — bu rainbow table larni ishdan chiqaradi. <code>compare</code> saltni saqlangan hashdan qayta oladi.'
+      },
+      {
+        q: 'JWT payload i qanday?',
+        opts: ['Secret bilan AES shifrlangan', 'Base64url kodlangan va har kim o‘qiy oladi; faqat imzo himoyalangan', 'Hashlangan va dekod qilib bo‘lmaydi', 'Server tomonida saqlanadi'],
+        exp: 'Payload faqat <b>kodlangan</b>, shifrlanmagan. Secret imzoni imzolaydi (yaxlitlik). Unga hech qachon sir/parol qo‘ymang.'
+      },
+      {
+        q: 'Refresh token ni <code>httpOnly</code> cookie da saqlash asosan nima uchun?',
+        opts: ['Tezroq eskirishi uchun', 'Mijoz JS uni o‘qiy olmasligi uchun, XSS token o‘g‘irlanishini kamaytiradi', 'CORS ni yoqish uchun', 'Uni siqish uchun'],
+        exp: '<code>httpOnly</code> cookie ni <code>document.cookie</code> dan yashiradi, shuning uchun inyeksiya qilingan skriptlar tokenni o‘g‘irlay olmaydi.'
+      },
+      {
+        q: 'Cookie dagi <code>sameSite: "strict"</code> asosan nimadan himoya qiladi?',
+        opts: ['XSS', 'CSRF (cross-site request forgery)', 'SQL inyeksiya', 'Brute force'],
+        exp: '<code>sameSite</code> brauzerga cookie ni cross-site so‘rovlarda yubormaslikni aytadi — bu CSRF himoyasining asosi.'
+      },
+      {
+        q: '<code>app.use(helmet())</code> nima qiladi?',
+        opts: ['So‘rovlarni rate limit qiladi', 'Xavfsiz HTTP javob headerlarini o‘rnatadi (CSP, HSTS, X-Frame-Options va h.k.)', 'Body ni shifrlaydi', 'JWT larni tekshiradi'],
+        exp: 'Helmet keng tarqalgan veb zaifliklarni kamaytirish uchun bir qator xavfsizlik headerlarini o‘rnatadi.'
+      },
+      {
+        q: 'CORS — bu qanday mexanizm?',
+        opts: ['Trafikni shifrlaydi', 'Javob headerlari orqali API qaysi cross-origin brauzer so‘rovlariga ruxsat berishini boshqaradi', 'Parollarni hashlaydi', 'SQL inyeksiyani bloklaydi'],
+        exp: 'CORS <code>Access-Control-Allow-Origin</code> kabi headerlar bilan brauzerga qaysi originlar API ni chaqirishi mumkinligini aytadi. Bu — shifrlash emas, brauzer siyosati.'
+      },
+      {
+        q: '<code>express-rate-limit</code> asosan nimadan himoya qiladi?',
+        opts: ['XSS', 'Login kabi endpointlarga brute-force / suiiste’mol so‘rov toshqinlaridan', 'CSRF', 'Buzilgan CORS'],
+        exp: 'Rate limiting IP/vaqt oynasi bo‘yicha so‘rovlarni cheklaydi, brute-force login urinishlari va oddiy DoS suiiste’molini yumshatadi.'
+      },
+      {
+        q: 'Nega <code>restrictTo("admin")</code> <code>protect</code> dan <b>keyin</b> ishlashi kerak?',
+        opts: ['Tartib muhim emas', 'U <code>req.user.role</code> ni o‘qiydi, uni <code>protect</code> token tekshirgach o‘rnatadi', 'protect avval role ni oladi', 'Ular parallel ishlashi kerak'],
+        exp: '<code>protect</code> JWT ni tekshirib <code>req.user</code> ni biriktiradi. <code>restrictTo</code> keyin <code>req.user.role</code> ni tekshiradi — shuning uchun u ikkinchi bo‘lishi kerak.'
+      },
+      {
+        q: 'Access-token / refresh-token namunasi nimadan foydalanadi?',
+        opts: ['Ikkita bir xil uzoq yashovchi token', 'Qisqa yashovchi access token va uzoq yashovchi refresh token (ko‘pincha httpOnly cookie da)', 'Hech qachon eskirmaydigan bitta token', 'Faqat sessiya cookie lari'],
+        exp: 'Qisqa access token o‘g‘irlanish xavfini kamaytiradi; refresh token (xavfsiz saqlangan) qayta loginsiz yangi access token beradi.'
+      },
+      {
+        q: '<code>JWT_SECRET</code> qayerda saqlanishi kerak?',
+        opts: ['Controller ichida hardcode', 'Muhit o‘zgaruvchisida (<code>.env</code> / host config), hech qachon manba kodga commit qilinmaydi', 'JWT payload ida', 'Mijoz localStorage ida'],
+        exp: 'Sirlar muhit configida bo‘ladi, versiya nazoratidan tashqarida. Secret sizib chiqsa, har kim yaroqli token soxtalashtira oladi.'
+      },
+      {
+        q: 'Loginda nega noto‘g‘ri email va noto‘g‘ri parol uchun bir xil "Invalid credentials" xabari qaytariladi?',
+        opts: ['Kodni tejash uchun', 'Email ro‘yxatdan o‘tganini oshkor qilmaslik uchun (foydalanuvchi enumeratsiyasi oldi olinadi)', 'JWT buni talab qiladi', 'Har doim 200 qaytarish uchun'],
+        exp: 'Har xil xabarlar qaysi emaillar mavjudligini oshkor qiladi. Bitta umumiy 401 xabari akkaunt enumeratsiyasining oldini oladi.'
+      },
+
+      {
+        q: 'I/O callback ichida <code>setImmediate(cb)</code> va <code>setTimeout(cb, 0)</code> tartibi qanday?',
+        opts: ['Tartib aniqlanmagan', 'Ikkalasi I/O sikli ichida rejalashtirilsa, <code>setImmediate</code> <code>setTimeout(0)</code> dan oldin ishlaydi', '<code>setTimeout(0)</code> doim birinchi', 'Ular bir vaqtda ishlaydi'],
+        exp: 'I/O callback ichida loop timers fazasidan o‘tib bo‘lgan va keyin <b>check</b> fazasiga kiradi, shuning uchun <code>setImmediate</code> <code>setTimeout(0)</code> dan oldin ishlaydi. (Yuqori darajada tartib kafolatlanmagan.)'
+      },
+      {
+        q: 'Qaysi sikl har bir asinxron chaqiruvni <b>ketma-ket</b> kutadi?',
+        opts: ['<code>arr.forEach(async x => { await f(x) })</code>', '<code>for (const x of arr) { await f(x) }</code>', '<code>arr.map(x => f(x))</code>', '<code>arr.filter(async x => await f(x))</code>'],
+        exp: '<code>forEach</code> qaytgan promise larni e’tiborsiz qoldiradi (fire-and-forget), shuning uchun kutmaydi. Faqat <code>for...of</code> + <code>await</code> har iteratsiyada to‘xtaydi. Parallellik uchun <code>await Promise.all(arr.map(f))</code>.'
+      },
+      {
+        q: '3 ta asinxron chaqiruv qilyapsiz; biri rad etilishi mumkin, lekin barcha natijalarni xohlaysiz. Nima ishlatasiz?',
+        opts: ['<code>Promise.all</code>', '<code>Promise.allSettled</code>', '<code>Promise.race</code>', '<code>Promise.any</code>'],
+        exp: '<code>Promise.all</code> biri rad etilishi bilanoq rad etadi (qolganlari yo‘qoladi). <code>Promise.allSettled</code> barchasini kutib, har birini <code>{status, value|reason}</code> ko‘rinishida qaytaradi.'
+      },
+      {
+        q: 'Writable stream ning <code>.write()</code> i <code>false</code> qaytardi. Bu nimani bildiradi?',
+        opts: ['Yozish butunlay muvaffaqiyatsiz', 'Ichki bufer to‘lgan — yana yozishdan oldin <code>"drain"</code> hodisasini kuting (backpressure)', 'Stream yopilgan', 'Ma’lumot buzilgan'],
+        exp: '<code>false</code> bufer highWaterMark dan oshganini bildiradi. Backpressure ni hurmat qiling: <code>"drain"</code> ishlaguncha yozmang, aks holda xotira cheksiz o‘sishi mumkin.'
+      },
+      {
+        q: 'Event loop ni bloklamasdan CPU ga og‘ir hisobni bajarish kerak. Eng yaxshi vosita?',
+        opts: ['<code>setTimeout</code> bo‘laklari', '<code>worker_threads</code> (alohida oqimga o‘tkazish)', 'Kattaroq <code>for</code> sikli', '<code>process.nextTick</code>'],
+        exp: 'CPU ga og‘ir ish yagona JS oqimini bloklaydi. <code>worker_threads</code> uni boshqa oqimda bajaradi; <code>cluster</code> esa I/O ni yadrolarga masshtablash uchun jarayonlarni fork qiladi.'
+      },
+      {
+        q: 'Mijoz rate limit dan oshib ketdi. To‘g‘ri status kodi?',
+        opts: ['<code>400</code>', '<code>403</code>', '<code>429 Too Many Requests</code>', '<code>503</code>'],
+        exp: '<b>429 Too Many Requests</b> mijozga u cheklanganini bildiradi, ideal holda <code>Retry-After</code> header bilan.'
+      },
+      {
+        q: '<code>express.Router({ mergeParams: true })</code> nimani yoqadi?',
+        opts: ['Avtomatik body parsing', 'Ota-router da aniqlangan <code>:params</code> ga kirish (ichki route lar)', 'Ikki app ni birlashtirish', 'Registrga befarq route lar'],
+        exp: 'Sukut bo‘yicha ichki router ota route param larini ko‘ra olmaydi. <code>mergeParams:true</code> ularni ochadi — <code>/users/:userId/posts</code> kabi ichki resurslar uchun kerak.'
+      },
+      {
+        q: 'Qaysi so‘rov CORS <b>preflight</b> (<code>OPTIONS</code>) chaqiruvini keltirib chiqaradi?',
+        opts: ['Custom headersiz oddiy <code>GET</code>', '<code>PUT</code>/<code>DELETE</code>, yoki custom header yoxud <code>Content-Type: application/json</code> bo‘lgan so‘rov', 'Har qanday <code>GET</code>', 'Faqat same-origin so‘rovlar'],
+        exp: 'Oddiy bo‘lmagan so‘rovlar (GET/POST/HEAD dan tashqari metodlar, custom headerlar yoki JSON content-type) brauzerni avval ruxsatni tekshirish uchun <code>OPTIONS</code> preflight yuborishga majbur qiladi.'
+      },
+      {
+        q: 'Aggregation pipeline da <code>$lookup</code> nima qiladi?',
+        opts: ['Index yaratadi', 'Boshqa kolleksiyaga left outer join bajaradi', 'Mos hujjatlarni o‘chiradi', 'Natijalarni saralaydi'],
+        exp: '<code>$lookup</code> boshqa kolleksiyadan hujjatlarni qo‘shadi (left outer join), mosliklarni massiv sifatida joylaydi — MongoDB da so‘rov vaqtida kolleksiyalarni bog‘lash usuli.'
+      },
+      {
+        q: '<code>{ status: 1, createdAt: 1 }</code> kompozit index bilan qaysi so‘rov samarali bajariladi?',
+        opts: ['Faqat <code>{ createdAt }</code>', '<code>{ status }</code> yolg‘iz, yoki <code>{ status, createdAt }</code> — lekin <code>{ createdAt }</code> yolg‘iz EMAS', 'Har qanday bitta maydonli so‘rov', 'Hech qanday — kompozit indexlar ishlatilmaydi'],
+        exp: 'Kompozit index chapdan o‘ngga ishlaydi (prefiks qoidasi): u <code>status</code>, yoki <code>status + createdAt</code> so‘rovlarini bajaradi, lekin yolg‘iz <code>createdAt</code> ni emas.'
+      },
+      {
+        q: 'Mongoose <code>.lean()</code> nima qaytaradi va nega ishlatiladi?',
+        opts: ['To‘liq Mongoose hujjatlari, sekinroq', 'Oddiy JS obyektlari (getter/virtual/metodsiz) — o‘qish so‘rovlari uchun tezroq, kam xotira', 'Iteratsiya qilinadigan cursor', 'Faqat _id maydoni'],
+        exp: '<code>.lean()</code> to‘liq Mongoose hujjatlarini yaratmaydi va oddiy obyektlar qaytaradi — faqat o‘qish endpointlari uchun a’lo, lekin virtual, instance metod va o‘zgarishlarni kuzatishni yo‘qotasiz.'
+      },
+      {
+        q: 'MongoDB da ko‘p hujjatli ACID tranzaksiyalar nimani talab qiladi?',
+        opts: ['Alohida hech narsa', 'Replica set (yoki sharded cluster) va sessiya', 'Relatsion plagin', 'Indexlarni o‘chirish'],
+        exp: 'Tranzaksiyalar sessiyadan foydalanadi va replica set talab qiladi (yolg‘iz <code>mongod</code> qila olmaydi). Operatsiyalarni <code>session.withTransaction(...)</code> ichiga o‘rang.'
+      },
+      {
+        q: 'Nega holatsiz (stateless) JWT larni muddati tugashidan oldin bekor qilish qiyin?',
+        opts: ['Ular shifrlangan', 'Server sessiya saqlamaydi, shuning uchun yaroqli, muddati tugamagan tokenga ishoniladi — blocklist yoki qisqa muddat + refresh token kerak', 'Ular hech qachon eskirmaydi', 'Muddatni mijoz nazorat qiladi'],
+        exp: 'Server tomonida hech narsa saqlanmagani uchun o‘g‘irlangan token <code>exp</code> gacha ishlaydi. Yechim: qisqa muddatli access token + refresh rotatsiya, yoki server tomonida token/blocklist tekshiruvi.'
+      },
+      {
+        q: 'Login <code>User.findOne({ email: req.body.email })</code> qiladi, hujumchi <code>email: { "$gt": "" }</code> yuboradi. Xavf nimada?',
+        opts: ['Hech narsa', 'NoSQL inyeksiya — obyekt query operatori sifatida qabul qilinib mantiqni chetlab o‘tishi mumkin; kirish turlarini tekshiring', 'MongoDB ni qulatadi', 'Sxemani oshkor qiladi'],
+        exp: 'Xom so‘rov obyektlarini query ga uzatish hujumchiga <code>$gt</code>/<code>$ne</code> kabi operatorlarni kiritishga imkon beradi. Kirishni tekshiring/kastlang (masalan, <code>email</code> satr ekanini) yoki Zod/Joi ishlating.'
+      },
+      {
+        q: 'JWT ni <code>localStorage</code> da saqlash (httpOnly cookie o‘rniga) asosan nimaga ochiq qiladi?',
+        opts: ['CSRF', 'XSS — istalgan inyeksiya qilingan skript <code>localStorage</code> ni o‘qib tokenni o‘g‘irlashi mumkin', 'SQL inyeksiya', 'Rate limiting'],
+        exp: '<code>localStorage</code> ni JavaScript o‘qiy oladi, shuning uchun XSS payload tokenni chiqarib yuborishi mumkin. httpOnly cookie ni JS o‘qiy olmaydi (lekin CSRF himoyasi kerak).'
+      },
+      {
+        q: 'Nega sir/tokenlarni <code>===</code> emas, <code>crypto.timingSafeEqual</code> bilan solishtiriladi?',
+        opts: ['Tezroq', 'U doimiy vaqtda ishlaydi va javob tezligidan qiymatni aniqlaydigan timing hujumlarining oldini oladi', 'Kirishni hashlaydi', 'JWT buni talab qiladi'],
+        exp: '<code>===</code> birinchi farqli baytda to‘xtashi mumkin va timing orqali ma’lumot oshkor qiladi. <code>timingSafeEqual</code> doim bir xil vaqt oladi va timing yon-kanallarini yo‘q qiladi.'
+      },
+
+      {
+        q: 'ES Module da qaysi qator butun <code>fs</code> modulini <b>default</b> import qiladi?',
+        opts: ['<code>import { fs } from "fs"</code>', '<code>import fs from "fs"</code>', '<code>const fs = import("fs")</code>', '<code>require fs from "fs"</code>'],
+        exp: '<code>import fs from "fs"</code> — default import (modulning butun/default eksporti). <code>import { readFile } from "fs"</code> esa <b>named</b> import — jingalak qavs = named.'
+      },
+      {
+        q: 'Node ning standart callback imzosi ("xato-birinchi" konvensiyasi) qanday?',
+        opts: ['<code>(data, err)</code>', '<code>(err, data)</code>', '<code>(data)</code>', '<code>(res, err)</code>'],
+        exp: 'Node callbacklari <b>xato-birinchi</b>: <code>(err, data)</code>. <code>data</code> dan foydalanishdan oldin doim <code>if (err)</code> ni tekshiring.'
+      },
+      {
+        q: '<code>fs.appendFile</code> va <code>fs.writeFile</code> orasidagi farq?',
+        opts: ['Ular bir xil', '<code>appendFile</code> oxiriga qo‘shadi (fayl bo‘lmasa yaratadi); <code>writeFile</code> butun faylni qayta yozadi', '<code>appendFile</code> faqat sinxron', '<code>writeFile</code> fayl yarata olmaydi'],
+        exp: '<code>appendFile</code> qo‘shadi (va fayl bo‘lmasa yaratadi); <code>writeFile</code> butun mazmunni almashtiradi.'
+      },
+      {
+        q: 'Express da modulli, ulanadigan route to‘plamini qanday yaratasiz?',
+        opts: ['<code>express.json()</code>', '<code>express.Router()</code>', '<code>new express.Route()</code>', '<code>app.router()</code>'],
+        exp: '<code>const router = express.Router()</code> eksport qilib ulanadigan mini-app yaratadi. <code>express.json()</code> — body parser, boshqa narsa (ko‘p adashiladigan joy).'
+      },
+      {
+        q: '<code>app.use("/api/users", userRouter)</code> nima qiladi?',
+        opts: ['userRouter ni har bir route da ishga tushiradi', 'userRouter ni <code>/api/users</code> prefiksi ostida ulaydi', '/api/users ga yo‘naltiradi', 'Router yaratadi'],
+        exp: 'U routerni yo‘l prefiksiga ulaydi — <code>router.get("/")</code> route <code>GET /api/users</code> bo‘ladi. <code>Router()</code> emas, router <b>o‘zgaruvchisini</b> uzating.'
+      },
+      {
+        q: 'Sxemani foydalanish mumkin bo‘lgan modelga qanday aylantirasiz?',
+        opts: ['<code>mongoose.create("User", schema)</code>', '<code>mongoose.model("User", schema)</code>', '<code>mongoose.join("User", schema)</code>', '<code>new schema("User")</code>'],
+        exp: '<code>mongoose.model("User", userSchema)</code> sxemani query metodli modelga (<code>find</code>, <code>findOne</code>, <code>create</code>...) kompilyatsiya qiladi. <code>mongoose.create</code> yoki <code>mongoose.join</code> mavjud emas.'
+      },
+      {
+        q: '<code>GET /products?page=2</code> uchun <code>req.query.page</code> ning turi qanday?',
+        opts: ['Number <code>2</code>', 'String <code>"2"</code>', 'Boolean', 'undefined'],
+        exp: 'Query-string qiymatlari <b>doim satr</b> — <code>req.query.page</code> bu <code>"2"</code>. Hisobdan oldin <code>Number(req.query.page)</code> bilan aylantiring.'
+      },
+      {
+        q: 'Sahifali pagination uchun to‘g‘ri offset (skip) formulasi qaysi?',
+        opts: ['<code>page * limit</code>', '<code>(page - 1) * limit</code>', '<code>page / limit</code>', '<code>limit - page</code>'],
+        exp: '<code>skip = (page - 1) * limit</code>. 1-sahifa → skip 0; 2-sahifa, limit 10 → skip 10. So‘ng <code>.skip(skip).limit(limit)</code>.'
+      },
+
+      {
+        q: '<code>findByIdAndUpdate</code> <b>yangilangan</b> hujjatni qaytarishi VA sxema validatorlarini ishga tushirishi uchun qaysi opsiyalar kerak?',
+        opts: ['Faqat <code>{ new: true }</code>', '<code>{ new: true, runValidators: true }</code>', '<code>{ updated: true, validate: true }</code>', 'Opsiya kerak emas — ikkalasi ham default'],
+        exp: 'Default holatda <code>findByIdAndUpdate</code> <b>eski</b> hujjatni qaytaradi va validatorlarni <b>o‘tkazib yuboradi</b>. <code>{ new: true, runValidators: true }</code> yangilangan hujjatni beradi va qoidalarni tekshiradi.'
+      },
+      {
+        q: 'Aggregation pipeline da eng yaxshi unumdorlik uchun <code>$match</code> <code>$group</code> ga nisbatan qayerda turishi kerak?',
+        opts: ['<code>$group</code> dan keyin', '<code>$group</code> dan oldin — avval filtrlab, kamroq hujjat guruhlanadi', 'Tartib muhim emas', '<code>$group</code> ichida'],
+        exp: '<code>$match</code> ni imkon qadar erta qo‘ying (<code>$group</code>/<code>$sort</code> dan oldin) — shunda kamroq hujjat ishlanadi va indexlardan foydalaniladi.'
+      },
+      {
+        q: 'Qaysi biri hujjatning <code>views</code> maydonini atomik tarzda 1 ga oshiradi?',
+        opts: ['<code>doc.views++; doc.save()</code>', '<code>updateOne({_id}, { $inc: { views: 1 } })</code>', '<code>updateOne({_id}, { views: "+1" })</code>', '<code>updateOne({_id}, { $add: { views: 1 } })</code>'],
+        exp: '<code>$inc</code> bazada atomik oshirish qiladi (read-modify-write poygasi yo‘q). O‘qib-saqlash parallel yangilanishlarni yo‘qotadi; <code>$add</code> — aggregation operatori, update emas.'
+      },
+      {
+        q: 'JWT haqiqiyligini (imzo to‘g‘ri, muddati tugamagan) tasdiqlash uchun qaysini chaqirasiz?',
+        opts: ['<code>jwt.decode(token)</code>', '<code>jwt.verify(token, secret)</code>', '<code>jwt.read(token, secret)</code>', '<code>jwt.parse(token)</code>'],
+        exp: '<code>jwt.verify</code> imzo + muddatni tekshiradi va noto‘g‘ri bo‘lsa xato tashlaydi. <code>jwt.decode</code> esa payload ni <b>tekshirmasdan</b> o‘qiydi — auth uchun ishonmang.'
+      },
+      {
+        q: '1 soatda muddati tugaydigan tokenni qaysi biri to‘g‘ri imzolaydi?',
+        opts: ['<code>jwt.sign(payload, secret, { expiresIn: "1h" })</code>', '<code>jwt.sign(payload, { expiresIn: "1h" }, secret)</code>', '<code>jwt.create(payload, secret, "1h")</code>', '<code>jwt.encode(payload, secret, { exp: "1h" })</code>'],
+        exp: 'Imzo: <code>jwt.sign(payload, secret, options)</code> — secret <b>ikkinchi</b>, options uchinchi argument. <code>jwt.create/encode</code> — <code>jsonwebtoken</code> da yo‘q (faqat <code>sign</code>, <code>verify</code>, <code>decode</code>).'
+      },
+      {
+        q: '<code>upload.single("avatar")</code> ishlagach, yuklangan fayl qayerda?',
+        opts: ['<code>req.files</code>', '<code>req.file</code>', '<code>req.body.avatar</code>', '<code>req.avatar</code>'],
+        exp: '<code>single</code> bitta faylni <code>req.file</code> (birlik) ga qo‘yadi. <code>upload.array()</code> esa <code>req.files</code> (ko‘plik) ishlatadi. Matn maydonlari <code>req.body</code> da qoladi.'
+      },
+      {
+        q: 'Yuklangan faylni <code>req.file.buffer</code> da Buffer sifatida kerak (masalan S3 ga stream). Qaysi Multer storage?',
+        opts: ['<code>multer.diskStorage(...)</code>', '<code>multer.memoryStorage()</code>', '<code>multer.buffer()</code>', '<code>multer({ dest: "uploads/" })</code>'],
+        exp: '<code>memoryStorage()</code> faylni RAM da saqlab <code>req.file.buffer</code> ni beradi. <code>diskStorage</code>/<code>dest</code> diskka yozadi va <code>req.file.path</code> beradi.'
+      },
+      {
+        q: '3 ta mirror chaqirasiz va rad etganlarini e’tiborsiz qoldirib, birinchi <b>muvaffaqiyatli</b> bo‘lganini xohlaysiz. Nima?',
+        opts: ['<code>Promise.race</code>', '<code>Promise.any</code>', '<code>Promise.all</code>', '<code>Promise.allSettled</code>'],
+        exp: '<code>Promise.any</code> birinchi <b>bajarilgan</b> qiymat bilan hal bo‘ladi, rad etishlarni e’tiborsiz qoldiradi (faqat hammasi yiqilsa rad etadi). <code>Promise.race</code> esa birinchi tugaganiga — rad bo‘lsa ham — hal bo‘ladi.'
+      },
+
+      {
+        q: 'Telegraf da <code>/help</code> buyrug‘ini qanday boshqarasiz?',
+        opts: ['<code>bot.on("help", ctx => ...)</code>', '<code>bot.command("help", ctx => ctx.reply("..."))</code>', '<code>bot.hears("help", ctx => ...)</code>', '<code>bot.command("/help", ctx => ...)</code>'],
+        exp: '<code>bot.command("help", ...)</code> slash-buyruq handlerini ro‘yxatga oladi (nomi <b>slashsiz</b>). <code>bot.hears</code> ixtiyoriy matnni mos qiladi; <code>bot.on("help")</code> yaroqli update turi emas.'
+      },
+      {
+        q: 'Handler <code>(ctx) => {...}</code> ichida matnli javob qanday yuborasiz?',
+        opts: ['<code>ctx.send("Hi")</code>', '<code>ctx.reply("Hi")</code>', '<code>bot.reply("Hi")</code>', '<code>ctx.message.reply("Hi")</code>'],
+        exp: '<code>ctx.reply("Hi")</code> joriy chatga xabar yuboradi. <code>ctx.send</code>/<code>bot.reply</code> Telegraf metodlari emas.'
+      },
+      {
+        q: 'Botni long polling bilan qaysi biri ishga tushiradi?',
+        opts: ['<code>bot.start()</code>', '<code>bot.launch()</code>', '<code>bot.run()</code>', '<code>bot.listen(3000)</code>'],
+        exp: '<code>bot.launch()</code> ulanib update qabul qila boshlaydi. <code>bot.start()</code> esa <code>/start</code> buyrug‘i handleri, launcher emas.'
+      },
+      {
+        q: 'Kelayotgan xabar matnini qanday o‘qiysiz?',
+        opts: ['<code>ctx.text</code>', '<code>ctx.message.text</code>', '<code>ctx.body</code>', '<code>req.message.text</code>'],
+        exp: 'Update <code>ctx.message</code> da; matni <code>ctx.message.text</code>. Telegraf handlerida <code>req</code> yo‘q.'
+      },
+      {
+        q: 'Har qanday matnli xabar uchun (mazmunidan qat’i nazar) handler ishlashi?',
+        opts: ['<code>bot.command("text", ...)</code>', '<code>bot.on("text", ctx => ...)</code>', '<code>bot.hears("*", ...)</code>', '<code>bot.every("text", ...)</code>'],
+        exp: '<code>bot.on("text", ...)</code> barcha matnli updatelarda ishlaydi. <code>bot.hears</code> ga mos naqsh kerak; <code>bot.command</code> faqat slash-buyruqlarda ishlaydi.'
+      },
+      {
+        q: 'Qaysi biri <b>inline</b> klaviatura (xabar ostidagi tugmalar) yaratadi?',
+        opts: ['<code>Markup.keyboard([...])</code>', '<code>Markup.inlineKeyboard([Markup.button.callback("Yes", "y")])</code>', '<code>bot.inlineKeyboard([...])</code>', '<code>ctx.keyboard([...])</code>'],
+        exp: '<code>Markup.inlineKeyboard([...])</code> + <code>Markup.button.callback(text, data)</code> inline tugmalar yasaydi. <code>Markup.keyboard</code> esa reply (maxsus) klaviatura — boshqa narsa.'
+      },
+      {
+        q: 'Foydalanuvchi callback data <code>"buy"</code> bo‘lgan inline tugmani bosdi. Buni qanday boshqarasiz?',
+        opts: ['<code>bot.command("buy", ...)</code>', '<code>bot.action("buy", ctx => ctx.answerCbQuery())</code>', '<code>bot.on("buy", ...)</code>', '<code>bot.hears("buy", ...)</code>'],
+        exp: 'Inline tugma bosilishi — callback query → <code>bot.action("buy", ...)</code>. Spinnerni to‘xtatish uchun <code>ctx.answerCbQuery()</code>. <code>command</code>/<code>hears</code> buyruq/matn uchun.'
+      },
+
+      {
+        q: 'Express da barcha originlar uchun CORS ni qanday yoqasiz?',
+        opts: ['<code>app.use(helmet())</code>', '<code>app.use(cors())</code>', '<code>app.enableCors()</code>', '<code>app.use(express.cors())</code>'],
+        exp: '<code>cors</code> paketi: <code>app.use(cors())</code>. <code>app.enableCors()</code> — NestJS; <code>express.cors()</code> yo‘q; <code>helmet</code> xavfsizlik headerlarini qo‘yadi, CORS emas.'
+      },
+      {
+        q: 'Mijozdagi JavaScript o‘qiy olmaydigan cookie ni qanday o‘rnatasiz?',
+        opts: ['<code>res.cookie("t", v, { httpOnly: true })</code>', '<code>res.setCookie("t", v)</code>', '<code>res.header("Cookie", v)</code>', '<code>res.cookies.set("t", v)</code>'],
+        exp: '<code>res.cookie(name, value, { httpOnly: true })</code> — brauzer saqlaydi, lekin JS o‘qiy olmaydi (XSS himoyasi). Boshqa metod nomlari Express <code>res</code> da yo‘q.'
+      },
+      {
+        q: '<code>req.cookies</code> orqali kelgan cookie larni o‘qish uchun qaysi middleware qo‘shasiz?',
+        opts: ['<code>app.use(express.cookies())</code>', '<code>app.use(cookieParser())</code>', '<code>app.use(bodyParser.cookie())</code>', '<code>req.parseCookies()</code>'],
+        exp: '<code>cookie-parser</code> middleware — <code>app.use(cookieParser())</code> — <code>req.cookies</code> ni to‘ldiradi. Express da <code>express.cookies()</code> yo‘q.'
+      },
+      {
+        q: 'Render/Railway kabi hostda server portni qanday tanlashi kerak?',
+        opts: ['<code>app.listen(3000)</code> hardcode', '<code>app.listen(process.env.PORT || 3000)</code>', '<code>app.listen(env.PORT)</code>', '<code>app.listen(process.PORT)</code>'],
+        exp: 'Platforma portni <code>process.env.PORT</code> orqali beradi; lokalda 3000 ga qayt. Portni hardcode qilish deploy ni buzadi; <code>process.PORT</code>/<code>env.PORT</code> — noto‘g‘ri.'
+      },
+      {
+        q: '<code>.env</code> fayldagi o‘zgaruvchilarni <code>process.env</code> ga qaysi biri yuklaydi?',
+        opts: ['<code>require("dotenv").config()</code>', '<code>dotenv.load()</code>', '<code>require("env").config()</code>', '<code>process.loadEnv()</code>'],
+        exp: '<code>require("dotenv").config()</code> (erta, bir marta) <code>.env</code> ni <code>process.env</code> ga o‘qiydi. Qolganlari haqiqiy API emas.'
+      },
+      {
+        q: 'Frontend cookie larni boshqa origin dagi API ga yuborishi kerak. Nima talab qilinadi?',
+        opts: ['Hech narsa — cookie lar doim originlararo ketadi', 'Server: <code>cors({ origin, credentials: true })</code> VA mijoz: <code>fetch(url, { credentials: "include" })</code>', 'Faqat <code>app.use(cors())</code>', '<code>Access-Control-Allow-Origin: *</code> qo‘yish'],
+        exp: 'Originlararo cookie <b>ikkala</b> tomonni talab qiladi: server aniq origin uchun credentials ga ruxsat beradi, mijoz <code>credentials:"include"</code> bilan qo‘shiladi. <code>origin:"*"</code> credentials bilan <b>ruxsat etilmaydi</b>.'
+      }
+    ];
+
+    const PSOL_UZ = {
+      1: '<b>Bearer </b>(oxirida bo‘sh joy) · <b>split</b> · <b>401</b> · <b>verify</b> · <b>next</b>. Sxemani <code>startsWith("Bearer ")</code> bilan tekshiring, tokenni <code>split(" ")[1]</code> bilan oling, yo‘q bo‘lsa 401 bilan to‘xtating, <code>jwt.verify</code> imzoni tekshiradi (xato → 401 ushlanadi), so‘ng <code>req.user</code> ni biriktirib <code>next()</code> ni chaqiring.',
+      2: '<b>hash</b> · <b>12</b> · <b>compare</b>. <code>bcrypt.hash(pw, 12)</code> 12-cost bilan salt+hash qiladi; <code>bcrypt.compare(candidate, hash)</code> saltni qayta olib boolean qaytaradi. <code>isModified</code> tekshiruvi qayta hashlashning oldini oladi.',
+      3: '<b>catch</b> · <b>findById</b> · <b>404</b> · <b>json</b>. O‘ramchi rad etishlarni <code>.catch(next)</code> bilan uzatadi. <code>findById</code> topilmasa null qaytaradi → <code>AppError(...,404)</code> tashlanadi; muvaffaqiyatda <code>res.status(200).json(...)</code>.',
+      4: '<b>Schema</b> · <b>required</b> · <b>enum</b> · <b>Number</b> · <b>timestamps</b>. <code>new mongoose.Schema({...})</code>; <code>required:true</code> mavjudlikni majbur qiladi; <code>enum</code> ruxsat etilgan qiymatlarni cheklaydi; <code>min</code> bilan <code>type:Number</code>; <code>{timestamps:true}</code> createdAt/updatedAt qo‘shadi.',
+      5: '<b>events</b> · <b>EventEmitter</b> · <b>on</b> · <b>emit</b>. Yadro <code>events</code> modulini import qiling, <code>EventEmitter</code> ni kengaytiring, <code>.on("message", cb)</code> bilan ro‘yxatga oling va <code>.emit("message", data)</code> bilan chaqiring.',
+      6: '<b>async</b> · <b>await</b> · <b>all</b>. Funksiyani <code>async</code> qiling, so‘ng <code>await Promise.all([...])</code> ikkala chaqiruvni <i>parallel</i> bajaradi va ikkalasi tugaganda hal bo‘ladi (ketma-ket kutishdan tez).',
+      7: '<b>createServer</b> · <b>writeHead</b> · <b>end</b> · <b>listen</b>. <code>http.createServer((req,res)=>{...})</code>; <code>res.writeHead(200, headers)</code> status + header o‘rnatadi; <code>res.end(body)</code> javobni yuboradi; <code>server.listen(3000)</code> ishga tushiradi.',
+      8: '<b>includes</b> · <b>403</b> · <b>next</b>. <code>roles.includes(req.user.role)</code> ni tekshiring; ruxsat yo‘q bo‘lsa <code>next(new AppError("Forbidden", 403))</code>; aks holda davom etish uchun <code>next()</code>.'
+    };
+
+    const PSOL_EN_EXTRA = {
+      9: '<b>fs</b> · <b>appendFile</b> · <b>err</b>. <code>import fs from "fs"</code> is a <b>default</b> import (the whole module). <code>fs.appendFile</code> adds to the file (creating it if missing). Node callbacks are <b>error-first</b>: <code>(err, data)</code> — check <code>err</code> first.',
+      10: '<b>Router</b> · <b>json</b> · <b>use</b>. <code>express.Router()</code> makes a modular router. Register <code>express.json()</code> <i>before</i> routes. Mount with a prefix via <code>app.use("/api/users", userRouter)</code> — pass the router variable, NOT <code>Router()</code>.',
+      11: '<b>Schema</b> · <b>hash</b> · <b>compare</b> · <b>model</b> · <b>findOne</b>. Define with <code>new mongoose.Schema({...})</code> (not <code>create</code>); build the model with <code>mongoose.model("User", schema)</code> (not <code>join</code>). Hash in pre-save with <code>bcrypt.hash</code>, verify with <code>bcrypt.compare</code>, and look up via <code>User.findOne({ email }).select("+password")</code>.',
+      12: '<b>Number</b> · <b>Number</b> · <b>limit</b> · <b>limit</b>. <code>req.query</code> values are <b>always strings</b> — convert with <code>Number(...)</code>. Skip formula is <code>(page - 1) * limit</code>, then <code>.skip(skip).limit(limit)</code>.'
+    };
+    const PSOL_UZ_EXTRA = {
+      9: '<b>fs</b> · <b>appendFile</b> · <b>err</b>. <code>import fs from "fs"</code> — bu <b>default</b> import (butun modul). <code>fs.appendFile</code> faylga qo‘shadi (bo‘lmasa yaratadi). Node callbacklari <b>xato-birinchi</b>: <code>(err, data)</code> — avval <code>err</code> ni tekshiring.',
+      10: '<b>Router</b> · <b>json</b> · <b>use</b>. <code>express.Router()</code> modulli router yaratadi. <code>express.json()</code> ni route lardan <i>oldin</i> qo‘ying. Prefiks bilan <code>app.use("/api/users", userRouter)</code> orqali ulang — <code>Router()</code> emas, router o‘zgaruvchisini uzating.',
+      11: '<b>Schema</b> · <b>hash</b> · <b>compare</b> · <b>model</b> · <b>findOne</b>. <code>new mongoose.Schema({...})</code> bilan aniqlang (<code>create</code> emas); modelni <code>mongoose.model("User", schema)</code> bilan yarating (<code>join</code> emas). pre-save da <code>bcrypt.hash</code> bilan hashlang, <code>bcrypt.compare</code> bilan tekshiring, <code>User.findOne({ email }).select("+password")</code> bilan toping.',
+      12: '<b>Number</b> · <b>Number</b> · <b>limit</b> · <b>limit</b>. <code>req.query</code> qiymatlari <b>doim satr</b> — <code>Number(...)</code> bilan aylantiring. skip formulasi <code>(page - 1) * limit</code>, so‘ng <code>.skip(skip).limit(limit)</code>.'
+    };
+    Object.assign(PSOL, PSOL_EN_EXTRA);
+    Object.assign(PSOL_UZ, PSOL_UZ_EXTRA);
+
+    // ---------------- UI strings ----------------
+    const UI = {
+      en: {
+        check: 'Check Answers', shuffle: '🔀 Shuffle', show: 'Show Solutions', reset: 'Reset',
+        correct: 'Correct.', answer: 'Answer.', solution: 'Solution.', score: 'Score:', mcq: 'MCQ', code: 'Code', lang: '🌐 O‘zbekcha',
+        latest: 'Latest', best: 'Best', avg: 'Average', attempts: 'Attempts', trend: 'Trend', clear: 'Clear', time: 'Time'
+      },
+      uz: {
+        check: 'Tekshirish', shuffle: '🔀 Aralashtirish', show: 'Yechimlarni ko‘rsatish', reset: 'Tozalash',
+        correct: 'To‘g‘ri.', answer: 'Javob.', solution: 'Yechim.', score: 'Natija:', mcq: 'Test', code: 'Kod', lang: '🌐 English',
+        latest: 'Oxirgi', best: 'Eng yaxshi', avg: 'O‘rtacha', attempts: 'Urinishlar', trend: 'Tendensiya', clear: 'Tozalash', time: 'Vaqt'
+      }
+    };
+    const MK = {
+      en: {
+        title: '📝 Mock Test', hint: 'A timed exam that pulls only exam-style questions (short, parallel options — no length giveaways) plus coding tasks at the end. Auto-submits when time runs out, then shows your result and full review.',
+        start: '▶ Start Mock Test', qWord: 'Questions', mWord: 'Minutes', topic: 'Topic', codeWord: 'Code tasks',
+        submit: 'Submit Test', quit: 'Quit', pass: 'PASS', fail: 'FAIL', review: 'Review answers ↓', retake: 'Retake', exit: 'Exit to practice',
+        score: 'Score', timeUsed: 'Time used', breakdown: 'By section', answered: 'answered', mockLabel: 'Mock', timeUp: 'Time up', codeSec: 'Code'
+      },
+      uz: {
+        title: '📝 Sinov imtihoni', hint: 'Faqat imtihon uslubidagi savollarni (qisqa, parallel variantlar — uzunlik bo‘yicha ipuchi bermaydi) va oxirida kod topshiriqlarini oladigan vaqtli imtihon. Vaqt tugaganda avtomatik topshiriladi, so‘ng natija va to‘liq ko‘rib chiqish.',
+        start: '▶ Sinovni boshlash', qWord: 'Savollar', mWord: 'Daqiqa', topic: 'Mavzu', codeWord: 'Kod topshiriq',
+        submit: 'Topshirish', quit: 'Chiqish', pass: 'O‘TDI', fail: 'O‘TMADI', review: 'Javoblarni ko‘rish ↓', retake: 'Qayta', exit: 'Mashqqa qaytish',
+        score: 'Natija', timeUsed: 'Sarflangan vaqt', breakdown: 'Bo‘limlar bo‘yicha', answered: 'javob berildi', mockLabel: 'Sinov', timeUp: 'Vaqt tugadi', codeSec: 'Kod'
+      }
+    };
+    const IVUI = {
+      en: {
+        title: '🎤 Interview Questions', hint: 'Oral-round practice. Read the question, answer out loud, then reveal the model answer to check yourself.',
+        show: 'Show answer', hide: 'Hide answer', next: 'Next ▶', prev: '◀ Prev', random: '🎲 Random', q: 'Q', all: 'All'
+      },
+      uz: {
+        title: '🎤 Intervyu savollari', hint: 'Og‘zaki bosqich mashqi. Savolni o‘qing, ovoz chiqarib javob bering, so‘ng namunaviy javobni ochib o‘zingizni tekshiring.',
+        show: 'Javobni ko‘rsatish', hide: 'Javobni yashirish', next: 'Keyingi ▶', prev: '◀ Oldingi', random: '🎲 Tasodifiy', q: 'Savol', all: 'Hammasi'
+      }
+    };
+    // Most-asked backend interview questions (open-ended, with model answers)
+    const INTERVIEW = [
+      { g: "Node.js Core", q: 'What is Node.js and when would you choose it?', a: 'A JavaScript runtime on Google\'s V8 engine that runs JS outside the browser. It\'s single-threaded with a non-blocking, event-driven I/O model, so it excels at I/O-heavy, real-time apps, APIs and microservices. Avoid it for CPU-heavy work — offload that to <code>worker_threads</code> or another service.' },
+      { g: "Node.js Core", q: 'Explain the event loop.', a: 'Node runs JS on one thread and hands slow I/O to libuv. The loop cycles through phases (timers → pending → poll → check → close), running callbacks as work completes. Between phases it drains the microtask queue — <code>process.nextTick</code> first, then Promise callbacks — which is why microtasks run before timers.' },
+      { g: "Node.js Core", q: 'Difference between process.nextTick, setImmediate and setTimeout(fn, 0)?', a: '<code>process.nextTick</code> runs right after the current operation, before other microtasks. <code>setImmediate</code> runs in the check phase, after I/O. <code>setTimeout(fn,0)</code> runs in the timers phase with a minimum delay. Inside an I/O callback, <code>setImmediate</code> fires before <code>setTimeout(0)</code>.' },
+      { g: "Node.js Core", q: 'What are streams and why use them?', a: 'Streams process data in chunks instead of loading it all into memory — Readable, Writable, Duplex and Transform. They keep memory low, support backpressure, and are ideal for large files, network data, and piping (e.g. <code>fs.createReadStream().pipe(res)</code>).' },
+      { g: "Node.js Core", q: 'How does Node handle many requests if it\'s single-threaded?', a: 'The JS runs on one thread, but blocking I/O is delegated to libuv\'s thread pool / the OS. While waiting, the event loop keeps serving other requests, then runs the callback when I/O finishes. CPU-bound code still blocks everything — use <code>worker_threads</code> or <code>cluster</code>.' },
+      { g: "Node.js Core", q: 'CommonJS vs ES Modules?', a: 'CommonJS uses <code>require</code>/<code>module.exports</code>, loads synchronously, and is Node\'s default. ES Modules use <code>import</code>/<code>export</code>, are statically analyzable and tree-shakeable, and are enabled with <code>"type":"module"</code> in package.json. Default exports import without braces; named exports use braces.' },
+
+      { g: "Async", q: 'Callbacks vs Promises vs async/await?', a: 'Callbacks are the original pattern (error-first <code>(err, data)</code>) but nest into "callback hell". Promises are chainable objects with <code>.then/.catch</code>. <code>async/await</code> is syntactic sugar over Promises that reads synchronously and uses <code>try/catch</code> for errors — the modern default.' },
+      { g: "Async", q: 'Promise.all vs allSettled vs race vs any?', a: '<code>all</code> resolves when all fulfil, rejects on the first rejection. <code>allSettled</code> waits for all and returns each status. <code>race</code> settles on the first to finish (fulfil or reject). <code>any</code> resolves on the first fulfilled, ignoring rejections.' },
+      { g: "Async", q: 'How do you handle errors in async code?', a: 'Wrap <code>await</code> in <code>try/catch</code>. In Express, wrap async handlers so rejections reach the error middleware (<code>.catch(next)</code> / a catchAsync helper). Add a global <code>unhandledRejection</code> handler as a safety net, and never swallow errors silently.' },
+
+      { g: "Express.js", q: 'What is middleware and what types are there?', a: 'A function <code>(req, res, next)</code> that runs between the request and response. Types: application-level (<code>app.use</code>), router-level, error-handling (four args), built-in (<code>express.json</code>), and third-party (<code>cors</code>, <code>helmet</code>, <code>morgan</code>). It runs in registration order and must call <code>next()</code> or send a response.' },
+      { g: "Express.js", q: 'How does error handling work in Express?', a: 'You register an error-handling middleware with four params <code>(err, req, res, next)</code> <b>last</b>, after all routes. Handlers pass errors with <code>next(err)</code> (or throw in Express 5). The central handler maps the error to a status code and a consistent JSON shape.' },
+      { g: "Express.js", q: 'req.params vs req.query vs req.body?', a: '<code>req.params</code> holds route segments like <code>:id</code>. <code>req.query</code> holds the <code>?key=value</code> string (always strings — convert with <code>Number()</code>). <code>req.body</code> holds the payload and requires a body parser like <code>express.json()</code>.' },
+      { g: "Express.js", q: 'How would you structure a scalable Express app?', a: 'Separate concerns: routes → controllers → services → models, plus middleware, config/env, validation and a central error handler. One <code>Router</code> per resource, business logic in services (not controllers), and environment config via <code>process.env</code>. This keeps it testable and maintainable.' },
+
+      { g: "REST API Design", q: 'What is REST and its key principles?', a: 'An architectural style for APIs: client-server separation, statelessness (each request self-contained), cacheable responses, a uniform interface (resources as nouns + HTTP methods), and layering. It makes APIs predictable and scalable.' },
+      { g: "REST API Design", q: 'Which HTTP methods are idempotent, and why does it matter?', a: 'GET, PUT and DELETE are idempotent — calling them repeatedly yields the same state. POST is not (it creates each time). It matters for safe retries: a client can retry an idempotent request after a network failure without side effects.' },
+      { g: "REST API Design", q: 'Walk me through the status codes you use.', a: '2xx: 200 OK, 201 Created (POST), 204 No Content (DELETE). 4xx client errors: 400 bad request, 401 unauthenticated, 403 forbidden, 404 not found, 409 conflict, 422 validation, 429 too many requests. 5xx: 500 internal, 503 unavailable.' },
+      { g: "REST API Design", q: 'How do you paginate an API?', a: 'Offset pagination: <code>?page&limit</code> → <code>skip = (page-1)*limit</code>, then <code>.skip(skip).limit(limit)</code>, returning meta like <code>total</code> and <code>totalPages</code>. For large/real-time data prefer cursor (keyset) pagination on an indexed field to avoid deep-skip cost.' },
+
+      { g: "MongoDB & Mongoose", q: 'SQL vs NoSQL — when would you pick MongoDB?', a: 'MongoDB is a document store with a flexible schema and easy horizontal scaling — good for evolving, JSON-like data and read-heavy apps. SQL suits strong relations, complex joins and strict transactions. MongoDB does support multi-document transactions on a replica set when needed.' },
+      { g: "MongoDB & Mongoose", q: 'Embedding vs referencing — how do you decide?', a: 'Embed when data is read together, one-to-few, and bounded (e.g. an address on a user). Reference when it\'s one-to-many/many-to-many, large or unbounded, or shared across documents. Balance read speed (embedding) against duplication and update cost (referencing).' },
+      { g: "MongoDB & Mongoose", q: 'What are indexes and their trade-offs?', a: 'Indexes are data structures that make queries fast without scanning the whole collection — single-field, compound (left-to-right prefix rule), text, unique. The trade-off is slower writes and more storage. Use <code>explain()</code> to confirm a query uses one.' },
+      { g: "MongoDB & Mongoose", q: 'How does .populate() work?', a: 'You store an <code>ObjectId</code> reference with a <code>ref</code> to another model; <code>.populate("field")</code> runs a second query and swaps the id for the full document. It\'s Mongoose emulating a join — not a real database join — so use it mindfully to avoid extra round-trips.' },
+      { g: "MongoDB & Mongoose", q: 'What is the aggregation pipeline?', a: 'A staged data-processing pipeline: documents flow through stages like <code>$match</code> (filter), <code>$group</code> (aggregate: sum/avg/count), <code>$sort</code>, <code>$project</code> and <code>$lookup</code> (join). Put <code>$match</code> early for performance. It\'s used for analytics and reporting.' },
+
+      { g: "Auth & Security", q: 'Sessions vs JWT — trade-offs?', a: 'Sessions store state on the server and the cookie holds an id — easy to revoke but needs server/shared storage. JWTs are stateless and signed, so they scale well, but are hard to revoke before expiry. The common fix: short-lived access tokens plus refresh tokens (and/or a blocklist).' },
+      { g: "Auth & Security", q: 'How do you store passwords securely?', a: 'Never in plain text and never with reversible encryption. Hash with <code>bcrypt</code> (or argon2), which adds a random salt and a cost factor. At login, verify with <code>bcrypt.compare(plain, hash)</code>. Hashing is one-way, so even a DB leak doesn\'t reveal passwords.' },
+      { g: "Auth & Security", q: 'What\'s inside a JWT and is it secure?', a: 'Three base64url parts: header.payload.signature. The payload is only encoded, not encrypted — anyone can read it, so never put secrets in it. The signature (signed with your secret) guarantees integrity/authenticity. Keep the secret safe and verify with <code>jwt.verify</code>.' },
+      { g: "Auth & Security", q: 'Explain access vs refresh tokens.', a: 'A short-lived access token (minutes) authorizes requests and limits damage if leaked. A long-lived refresh token (stored in an httpOnly cookie) is used only to mint new access tokens without re-login. Rotate refresh tokens and keep a way to revoke them.' },
+      { g: "Auth & Security", q: 'Name common web vulnerabilities and how you mitigate them.', a: 'XSS → escape output, httpOnly cookies, a Content-Security-Policy. CSRF → <code>sameSite</code> cookies and CSRF tokens. Injection → validate/sanitize input, never pass raw objects into queries. Plus rate limiting, <code>helmet</code> headers, and HTTPS everywhere.' },
+
+      { g: "FullStack", q: 'What is CORS and how do you enable it?', a: 'CORS is the browser\'s cross-origin rule; the server opts in with <code>Access-Control-Allow-*</code> headers. In Express use <code>app.use(cors({ origin, credentials }))</code>. Non-simple requests trigger an <code>OPTIONS</code> preflight, and <code>origin:"*"</code> can\'t be combined with credentials.' },
+      { g: "FullStack", q: 'How do cookies work, and what do httpOnly/secure/sameSite do?', a: 'The server sends <code>Set-Cookie</code> and the browser resends it on matching requests. <code>httpOnly</code> hides it from JavaScript (XSS defense), <code>secure</code> restricts it to HTTPS, and <code>sameSite</code> limits cross-site sending (CSRF defense).' },
+      { g: "FullStack", q: 'How do you handle environment config and deployment?', a: 'Keep config in <code>process.env</code>, loaded via <code>dotenv</code> locally and injected by the host in production; bind to <code>process.env.PORT</code>. Never commit secrets. Use per-stage env, a process manager or containers, health checks, and centralized logging/monitoring.' },
+
+      { g: "Telegram Bot", q: 'How does a Telegram bot receive updates?', a: 'Two ways: long polling (the bot repeatedly asks Telegram for updates — <code>bot.launch()</code> in Telegraf) or webhooks (Telegram pushes updates to your HTTPS URL via <code>setWebhook</code>). Handlers like <code>bot.command</code>, <code>bot.on</code> and <code>bot.action</code> respond to them.' },
+      { g: "Telegram Bot", q: 'Long polling vs webhooks — which and when?', a: 'Long polling is simplest for development — the bot pulls updates, no public URL needed. Webhooks are better for production: Telegram pushes updates to your server, which is more efficient and scalable, but requires a public HTTPS endpoint.' },
+
+      { g: "General", q: 'How would you improve a slow API\'s performance?', a: 'Profile first, then: add indexes, cache hot data (e.g. Redis), paginate, fix N+1 queries (batch/populate wisely), enable gzip, use connection pooling and async I/O, and scale out with clustering / a load balancer. Measure before and after each change.' },
+      { g: "General", q: 'How do you keep an API secure and robust in production?', a: 'Validate every input (Zod/Joi), enforce authn/authz, rate-limit, set security headers with <code>helmet</code>, centralize error handling, run over HTTPS, apply least-privilege on DB/keys, keep secrets in env, and add logging + monitoring/alerts.' },
+      { g: "General", q: 'Explain MVC / clean layering in a Node API.', a: 'Separate responsibilities: routes map URLs to controllers; controllers handle req/res; services hold business logic; models talk to the database. Keeping logic out of controllers makes the code testable, reusable and easy to change — controllers stay thin.' },
+      { g: "General", q: 'How do you debug a Node.js application?', a: 'Run with <code>node --inspect</code> and attach Chrome DevTools or the IDE debugger; set breakpoints and inspect the call stack. Add structured logging (and <code>morgan</code> for requests), read error stack traces, reproduce with a failing test, and isolate the layer that breaks.' }
+    ];
+    const IV_UZ = [
+      { q: 'Node.js nima va uni qachon tanlaysiz?', a: 'Google V8 dvigatelida ishlaydigan, JS ni brauzerdan tashqarida ishga tushiradigan JavaScript runtime. U bir oqimli, bloklamaydigan, hodisaga asoslangan I/O modeliga ega, shuning uchun I/O ga og‘ir, real-time ilovalar, API va mikroservislar uchun a’lo. CPU ga og‘ir ish uchun mos emas — uni <code>worker_threads</code> ga yoki boshqa servisga o‘tkazing.' },
+      { q: 'Event loop ni tushuntiring.', a: 'Node JS ni bitta oqimda ishlatadi va sekin I/O ni libuv ga beradi. Loop fazalar (timers → pending → poll → check → close) bo‘ylab aylanadi va ish tugagach callbacklarni ishga tushiradi. Fazalar orasida mikrotask navbatini bo‘shatadi — avval <code>process.nextTick</code>, keyin Promise callbacklari — shuning uchun mikrotasklar timerlardan oldin ishlaydi.' },
+      { q: 'process.nextTick, setImmediate va setTimeout(fn, 0) farqi?', a: '<code>process.nextTick</code> joriy amaldan so‘ng, boshqa mikrotasklardan oldin ishlaydi. <code>setImmediate</code> check fazasida, I/O dan keyin ishlaydi. <code>setTimeout(fn,0)</code> timers fazasida minimal kechikish bilan. I/O callback ichida <code>setImmediate</code> <code>setTimeout(0)</code> dan oldin ishlaydi.' },
+      { q: 'Streamlar nima va nega ishlatiladi?', a: 'Streamlar ma’lumotni butunlay xotiraga yuklash o‘rniga bo‘laklab qayta ishlaydi — Readable, Writable, Duplex, Transform. Ular xotirani kam ishlatadi, backpressure ni qo‘llaydi va katta fayllar, tarmoq ma’lumoti va pipe uchun ideal (masalan <code>fs.createReadStream().pipe(res)</code>).' },
+      { q: 'Bir oqimli bo‘lsa, Node ko‘p so‘rovni qanday uddalaydi?', a: 'JS bitta oqimda ishlaydi, lekin bloklovchi I/O libuv thread pool / OS ga topshiriladi. Kutish paytida event loop boshqa so‘rovlarga xizmat qiladi, I/O tugagach callbackni ishga tushiradi. CPU ga og‘ir kod baribir hammasini bloklaydi — <code>worker_threads</code> yoki <code>cluster</code> ishlating.' },
+      { q: 'CommonJS va ES Modules farqi?', a: 'CommonJS <code>require</code>/<code>module.exports</code> ishlatadi, sinxron yuklanadi va Node standarti. ES Modules <code>import</code>/<code>export</code> ishlatadi, statik tahlil qilinadi va tree-shaking mumkin, package.json da <code>"type":"module"</code> bilan yoqiladi. Default export qavssiz, named export qavs bilan import qilinadi.' },
+
+      { q: 'Callback, Promise va async/await farqi?', a: 'Callbacklar — dastlabki uslub (xato-birinchi <code>(err, data)</code>), lekin "callback hell" ga olib keladi. Promise — <code>.then/.catch</code> bilan zanjirlanadigan obyekt. <code>async/await</code> — Promise ustidagi sintaktik shakar, sinxrondek o‘qiladi va xatolar uchun <code>try/catch</code> ishlatadi — zamonaviy standart.' },
+      { q: 'Promise.all, allSettled, race, any farqi?', a: '<code>all</code> hammasi bajarilsa hal bo‘ladi, birinchi rad etishda rad etadi. <code>allSettled</code> hammasini kutib, har birining holatini qaytaradi. <code>race</code> birinchi tugaganiga (bajarilgan yoki rad) hal bo‘ladi. <code>any</code> birinchi bajarilganiga hal bo‘ladi, rad etishlarni e’tiborsiz qoldiradi.' },
+      { q: 'Asinxron kodda xatolarni qanday boshqarasiz?', a: '<code>await</code> ni <code>try/catch</code> ga o‘rang. Express da asinxron handlerlarni o‘rab, rad etishlar error middleware ga yetsin (<code>.catch(next)</code> / catchAsync). Xavfsizlik uchun global <code>unhandledRejection</code> qo‘shing va xatolarni jimgina yutmang.' },
+
+      { q: 'Middleware nima va qanday turlari bor?', a: 'So‘rov va javob orasida ishlaydigan <code>(req, res, next)</code> funksiyasi. Turlari: ilova darajasida (<code>app.use</code>), router darajasida, xato boshqaruvchi (to‘rt argument), o‘rnatilgan (<code>express.json</code>) va uchinchi tomon (<code>cors</code>, <code>helmet</code>, <code>morgan</code>). U ro‘yxat tartibida ishlaydi va <code>next()</code> chaqirishi yoki javob yuborishi kerak.' },
+      { q: 'Express da xatolar qanday boshqariladi?', a: 'To‘rt parametrli <code>(err, req, res, next)</code> xato middleware ni <b>eng oxirida</b>, barcha route lardan keyin ro‘yxatga olasiz. Handlerlar xatoni <code>next(err)</code> bilan uzatadi (yoki Express 5 da throw). Markaziy handler xatoni status kod va izchil JSON ko‘rinishga aylantiradi.' },
+      { q: 'req.params, req.query, req.body farqi?', a: '<code>req.params</code> — <code>:id</code> kabi route bo‘laklari. <code>req.query</code> — <code>?key=value</code> qatori (doim satr — <code>Number()</code> bilan aylantiring). <code>req.body</code> — payload, <code>express.json()</code> kabi parser talab qiladi.' },
+      { q: 'Masshtablanadigan Express ilovasini qanday tuzasiz?', a: 'Mas’uliyatlarni ajrating: routes → controllers → services → models, hamda middleware, config/env, validatsiya va markaziy xato handler. Har resurs uchun bitta <code>Router</code>, biznes mantiq servislarда (controllerlarda emas), config <code>process.env</code> orqali. Bu testlash va boshqarishni osonlashtiradi.' },
+
+      { q: 'REST nima va asosiy tamoyillari?', a: 'API lar uchun arxitektura uslubi: client-server ajratish, holatsizlik (har so‘rov o‘zini ta’minlaydi), keshlanuvchi javoblar, yagona interfeys (resurslar ot + HTTP metodlar) va qatlamlilik. Bu API ni oldindan aytiladigan va masshtablanadigan qiladi.' },
+      { q: 'Qaysi HTTP metodlar idempotent va bu nega muhim?', a: 'GET, PUT, DELETE idempotent — takror chaqirilsa ham bir xil holat beradi. POST emas (har safar yaratadi). Bu xavfsiz qayta urinish uchun muhim: mijoz tarmoq xatosidan keyin idempotent so‘rovni yon ta’sirsiz qayta yubora oladi.' },
+      { q: 'Ishlatadigan status kodlaringizni aytib bering.', a: '2xx: 200 OK, 201 Created (POST), 204 No Content (DELETE). 4xx mijoz xatolari: 400, 401, 403, 404, 409, 422, 429. 5xx: 500 ichki xato, 503 mavjud emas.' },
+      { q: 'API ni qanday paginate qilasiz?', a: 'Offset pagination: <code>?page&limit</code> → <code>skip = (page-1)*limit</code>, so‘ng <code>.skip(skip).limit(limit)</code>, <code>total</code>/<code>totalPages</code> meta bilan. Katta/real-time ma’lumot uchun chuqur skip narxidan qochish uchun indexlangan maydonda cursor (keyset) pagination afzal.' },
+
+      { q: 'SQL va NoSQL — MongoDB ni qachon tanlaysiz?', a: 'MongoDB — moslashuvchan sxemali va oson gorizontal masshtablanadigan document store; rivojlanuvchi, JSON-ga o‘xshash ma’lumot va o‘qishga og‘ir ilovalar uchun yaxshi. SQL kuchli bog‘lanish, murakkab join va qat’iy tranzaksiyalar uchun. MongoDB kerak bo‘lsa replica set da ko‘p hujjatli tranzaksiyani ham qo‘llaydi.' },
+      { q: 'Embedding va referencing — qanday tanlaysiz?', a: 'Birga o‘qiladigan, one-to-few va chegaralangan ma’lumotni embed qiling (masalan foydalanuvchidagi manzil). One-to-many/many-to-many, katta yoki cheksiz, yoki umumiy ma’lumotni reference qiling. O‘qish tezligi (embed) va dublikat/yangilash narxi (reference) o‘rtasida muvozanat.' },
+      { q: 'Indexlar nima va ularning kelishuvi?', a: 'Indexlar — butun kolleksiyani skaner qilmasdan so‘rovlarni tezlashtiradigan tuzilmalar — bitta maydonli, kompozit (chapdan o‘ngga prefiks qoidasi), matnli, unik. Kelishuv: sekinroq yozish va ko‘proq xotira. So‘rov indexdan foydalanishini <code>explain()</code> bilan tasdiqlang.' },
+      { q: '.populate() qanday ishlaydi?', a: 'Boshqa modelga <code>ref</code> bilan <code>ObjectId</code> referens saqlaysiz; <code>.populate("field")</code> ikkinchi so‘rov bajarib, id ni to‘liq hujjatga almashtiradi. Bu Mongoose joinni taqlid qilishi — haqiqiy DB join emas — shuning uchun ortiqcha so‘rovlardan qochib, ehtiyot bilan ishlating.' },
+      { q: 'Aggregation pipeline nima?', a: 'Bosqichli ma’lumotni qayta ishlash quvuri: hujjatlar <code>$match</code> (filtr), <code>$group</code> (yig‘indi/o‘rtacha/son), <code>$sort</code>, <code>$project</code> va <code>$lookup</code> (join) bosqichlaridan o‘tadi. Unumdorlik uchun <code>$match</code> ni erta qo‘ying. Analitika va hisobotlar uchun ishlatiladi.' },
+
+      { q: 'Session va JWT — kelishuvlar?', a: 'Sessionlar holatni serverda saqlaydi, cookie id ni ushlaydi — bekor qilish oson, lekin server/umumiy xotira kerak. JWT holatsiz va imzolangan, yaxshi masshtablanadi, lekin muddat tugashidan oldin bekor qilish qiyin. Odatiy yechim: qisqa muddatli access token + refresh token (va/yoki blocklist).' },
+      { q: 'Parollarni qanday xavfsiz saqlaysiz?', a: 'Hech qachon ochiq matnda va qaytariladigan shifrlashda emas. <code>bcrypt</code> (yoki argon2) bilan hashlang — tasodifiy salt va cost faktor qo‘shadi. Loginda <code>bcrypt.compare(plain, hash)</code> bilan tekshiring. Hashing bir tomonlama, shuning uchun DB sizib chiqsa ham parollar oshkor bo‘lmaydi.' },
+      { q: 'JWT ichida nima bor va u xavfsizmi?', a: 'Uch base64url qism: header.payload.signature. Payload faqat kodlangan, shifrlanmagan — har kim o‘qiy oladi, shuning uchun unga sir qo‘ymang. Imzo (sizning secret bilan imzolangan) yaxlitlik/haqiqiylikni kafolatlaydi. Secret ni xavfsiz saqlang va <code>jwt.verify</code> bilan tekshiring.' },
+      { q: 'Access va refresh token ni tushuntiring.', a: 'Qisqa muddatli access token (daqiqalar) so‘rovlarni avtorizatsiya qiladi va sizib chiqsa zararni cheklaydi. Uzoq muddatli refresh token (httpOnly cookie da) faqat qayta loginsiz yangi access token olish uchun ishlatiladi. Refresh tokenni rotatsiya qiling va bekor qilish yo‘lini saqlang.' },
+      { q: 'Keng tarqalgan veb zaifliklar va ularni qanday kamaytirasiz?', a: 'XSS → chiqishni escape qilish, httpOnly cookie, Content-Security-Policy. CSRF → <code>sameSite</code> cookie va CSRF token. Injection → kirishni tekshirish/tozalash, xom obyektlarni query ga bermaslik. Ustiga rate limiting, <code>helmet</code> headerlar va hamma joyda HTTPS.' },
+
+      { q: 'CORS nima va uni qanday yoqasiz?', a: 'CORS — brauzerning originlararo qoidasi; server <code>Access-Control-Allow-*</code> headerlar bilan ruxsat beradi. Express da <code>app.use(cors({ origin, credentials }))</code>. Oddiy bo‘lmagan so‘rovlar <code>OPTIONS</code> preflight ni keltirib chiqaradi, va <code>origin:"*"</code> credentials bilan birga ishlatilmaydi.' },
+      { q: 'Cookie qanday ishlaydi va httpOnly/secure/sameSite nima qiladi?', a: 'Server <code>Set-Cookie</code> yuboradi, brauzer mos so‘rovlarda uni qayta yuboradi. <code>httpOnly</code> uni JavaScriptdan yashiradi (XSS himoyasi), <code>secure</code> faqat HTTPS bilan cheklaydi, <code>sameSite</code> cross-site yuborishni cheklaydi (CSRF himoyasi).' },
+      { q: 'Muhit configi va deploy ni qanday boshqarasiz?', a: 'Configni <code>process.env</code> da saqlang, lokalda <code>dotenv</code> bilan yuklab, productionda host tomonidan berilsin; <code>process.env.PORT</code> ga ulaning. Sirlarni hech qachon commit qilmang. Har bosqich uchun alohida env, process menejeri yoki konteynerlar, health check va markazlashgan logging/monitoring ishlating.' },
+
+      { q: 'Telegram bot updatelarni qanday oladi?', a: 'Ikki yo‘l: long polling (bot Telegramdan updatelarni takroran so‘raydi — Telegraf da <code>bot.launch()</code>) yoki webhook (Telegram <code>setWebhook</code> orqali sizning HTTPS URL ga updatelarni yuboradi). <code>bot.command</code>, <code>bot.on</code>, <code>bot.action</code> kabi handlerlar ularga javob beradi.' },
+      { q: 'Long polling va webhook — qaysi va qachon?', a: 'Long polling development uchun eng oddiy — bot updatelarni tortadi, ochiq URL kerak emas. Webhook production uchun yaxshiroq: Telegram updatelarni sizning serveringizga yuboradi, bu samaraliroq va masshtablanadi, lekin ochiq HTTPS endpoint talab qiladi.' },
+
+      { q: 'Sekin API unumdorligini qanday yaxshilaysiz?', a: 'Avval profiling, keyin: indexlar qo‘shish, issiq ma’lumotni keshlash (masalan Redis), pagination, N+1 so‘rovlarni tuzatish (oqilona batch/populate), gzip, connection pooling va asinxron I/O, hamda clustering / load balancer bilan masshtablash. Har o‘zgarishdan oldin va keyin o‘lchang.' },
+      { q: 'Productionda API ni qanday xavfsiz va mustahkam saqlaysiz?', a: 'Har kirishni tekshiring (Zod/Joi), authn/authz ni majburlang, rate-limit, <code>helmet</code> bilan xavfsizlik headerlari, markaziy xato boshqaruvi, HTTPS, DB/kalitlarda least-privilege, sirlarni env da saqlash, va logging + monitoring/ogohlantirishlar qo‘shing.' },
+      { q: 'Node API da MVC / toza qatlamlashni tushuntiring.', a: 'Mas’uliyatlarni ajrating: routes URL larni controllerlarga bog‘laydi; controllerlar req/res ni boshqaradi; servislar biznes mantiqni ushlaydi; modellar baza bilan gaplashadi. Mantiqni controllerdan tashqarida saqlash kodni testlanuvchi, qayta ishlatiladigan va o‘zgartirish oson qiladi — controllerlar yupqa qoladi.' },
+      { q: 'Node.js ilovasini qanday debug qilasiz?', a: '<code>node --inspect</code> bilan ishga tushirib Chrome DevTools yoki IDE debuggerini ulang; breakpoint qo‘yib call stack ni ko‘ring. Strukturaviy logging (va so‘rovlar uchun <code>morgan</code>) qo‘shing, xato stack trace larini o‘qing, yiqiladigan test bilan takrorlang va buziladigan qatlamni ajrating.' }
+    ];
+    let lang = 'en';
+
+    // ---------------- Progress history (persisted in localStorage) ----------------
+    let history = loadHistory();
+    function loadHistory() { try { return JSON.parse(localStorage.getItem('backendExamHistory') || '[]'); } catch (e) { return []; } }
+    function saveHistory() { try { localStorage.setItem('backendExamHistory', JSON.stringify(history)); } catch (e) { } }
+    function saveAttempt(rec) { history.push(rec); if (history.length > 200) history = history.slice(-200); saveHistory(); }
+    function clearHistory() {
+      if (history.length && !confirm(lang === 'uz' ? 'Barcha saqlangan natijalar o‘chirilsinmi?' : 'Clear all saved results?')) return;
+      history = []; saveHistory(); renderProgress();
+    }
+    function fmtSecs(s) { const m = Math.floor(s / 60); return m ? m + 'm ' + (s % 60) + 's' : s + 's'; }
+
+    function renderProgress() {
+      const box = document.getElementById('progressChart');
+      const stats = document.getElementById('progressStats');
+      const L = UI[lang];
+      if (!history.length) {
+        box.innerHTML = '<div class="prog-empty">' + STATIC[lang].progEmpty + '</div>';
+        stats.innerHTML = ''; return;
+      }
+      const d = history, n = d.length;
+      const W = 700, H = 240, pl = 42, pr = 16, pt = 16, pb = 30, plotW = W - pl - pr, plotH = H - pt - pb;
+      const xF = i => n === 1 ? pl + plotW / 2 : pl + (i / (n - 1)) * plotW;
+      const yF = p => pt + (1 - p / 100) * plotH;
+      let grid = '';
+      [0, 25, 50, 75, 100].forEach(g => {
+        const y = yF(g);
+        grid += '<line x1="' + pl + '" y1="' + y + '" x2="' + (W - pr) + '" y2="' + y + '" stroke="var(--border)" stroke-width="1"/>'
+          + '<text x="' + (pl - 8) + '" y="' + (y + 4) + '" text-anchor="end" font-size="11" fill="var(--muted)">' + g + '</text>';
+      });
+      let path = ''; d.forEach((a, i) => { path += (i ? 'L' : 'M') + xF(i).toFixed(1) + ' ' + yF(a.pct).toFixed(1) + ' '; });
+      const line = '<path d="' + path + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>';
+      let dots = '';
+      d.forEach((a, i) => {
+        const x = xF(i), y = yF(a.pct);
+        const c = a.pct >= 80 ? 'var(--green)' : a.pct >= 60 ? 'var(--amber)' : 'var(--red)';
+        const dt = new Date(a.t);
+        const when = dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' + dt.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        const tag = (a.filter && a.filter !== 'all') ? ' · ' + a.filter : '';
+        dots += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="4.5" fill="' + c + '" stroke="var(--bg)" stroke-width="1.5">'
+          + '<title>' + when + '  ·  ' + a.pct + '% (' + a.got + '/' + a.total + ')\n' + L.mcq + ' ' + a.mcq + ' · ' + L.code + ' ' + a.code + '\n' + L.time + ': ' + fmtSecs(a.secs) + tag + '</title></circle>';
+      });
+      let xlab = ''; const step = Math.max(1, Math.ceil(n / 6));
+      d.forEach((a, i) => {
+        if (i % step === 0 || i === n - 1) {
+          const dt = new Date(a.t);
+          xlab += '<text x="' + xF(i).toFixed(1) + '" y="' + (H - 10) + '" text-anchor="middle" font-size="10" fill="var(--muted)">'
+            + dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + '</text>';
+        }
+      });
+      box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" role="img">' + grid + line + dots + xlab + '</svg>';
+
+      const last = d[n - 1].pct, best = Math.max.apply(null, d.map(a => a.pct)), avg = Math.round(d.reduce((s, a) => s + a.pct, 0) / n);
+      let trend = '—';
+      if (n >= 2) { const diff = last - d[n - 2].pct; trend = (diff > 0 ? '▲ +' : diff < 0 ? '▼ ' : '– ') + Math.abs(diff) + '%'; }
+      stats.innerHTML = [['★ ' + L.latest, last + '%'], [L.best, best + '%'], [L.avg, avg + '%'], [L.attempts, n], [L.trend, trend]]
+        .map(function (kv) { return '<div class="prog-stat"><span>' + kv[0] + '</span><b>' + kv[1] + '</b></div>'; }).join('');
+    }
+
+    // ---------------- Shuffle helpers ----------------
+    const quiz = document.getElementById('quiz');
+    const practicalsBox = document.getElementById('practicals');
+    function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; }
+    let order = QUESTIONS.map((_, i) => i);
+    let solOn = false;
+    let currentFilter = 'all';
+
+    // ---------------- Topic filter ----------------
+    const TOPICS = [['All', 'Hammasi', 'all'], ['Node.js', 'Node.js', 'Node.js Core'], ['Express', 'Express', 'Express.js'],
+    ['REST', 'REST', 'REST API Design'], ['MongoDB', 'MongoDB', 'MongoDB & Mongoose'], ['Auth', 'Auth', 'Auth & Security'],
+    ['Telegram', 'Telegram', 'Telegram Bot'], ['FullStack', 'FullStack', 'FullStack']];
+    // Which topic each practical belongs to
+    const PRACTICAL_TOPIC = {
+      1: 'Auth & Security', 2: 'Auth & Security', 3: 'Express.js',
+      4: 'MongoDB & Mongoose', 5: 'Node.js Core', 6: 'Node.js Core', 7: 'Node.js Core', 8: 'Auth & Security',
+      9: 'Node.js Core', 10: 'Express.js', 11: 'MongoDB & Mongoose', 12: 'REST API Design'
+    };
+    const filtersBox = document.getElementById('filters');
+
+    function renderFilters() {
+      filtersBox.innerHTML = '';
+      TOPICS.forEach(([en, uz, key]) => {
+        const label = lang === 'uz' ? uz : en;
+        const n = key === 'all' ? QUESTIONS.length : QUESTIONS.filter(q => q.g === key).length;
+        const b = document.createElement('button');
+        b.className = 'fbtn' + (key === currentFilter ? ' active' : '');
+        b.innerHTML = label + ' <span style="opacity:.6">' + n + '</span>';
+        b.onclick = () => filterTopic(key);
+        filtersBox.appendChild(b);
+      });
+    }
+    function filterTopic(key) { currentFilter = key; renderFilters(); applyFilter(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    function applyFilter() {
+      let pos = 0;
+      order.forEach(qi => {
+        const card = quiz.querySelector('[data-q="' + qi + '"]');
+        if (!card) return;
+        const show = currentFilter === 'all' || QUESTIONS[qi].g === currentFilter;
+        card.style.display = show ? '' : 'none';
+        if (show) { pos++; card.querySelector('.qnum').textContent = 'Q' + pos; }
+      });
+      let anyP = false;
+      practicalsBox.querySelectorAll('.practical').forEach(w => {
+        const show = currentFilter === 'all' || w.dataset.topic === currentFilter;
+        w.style.display = show ? '' : 'none'; if (show) anyP = true;
+      });
+      document.getElementById('noPractical').style.display = anyP ? 'none' : 'block';
+    }
+
+    // Wrap each practical (grouphead + card) into one movable block, once. Tag its topic.
+    function wrapPracticals() {
+      const kids = [...practicalsBox.children];
+      practicalsBox.innerHTML = '';
+      for (let i = 0; i < kids.length; i += 2) {
+        const w = document.createElement('div'); w.className = 'practical';
+        w.appendChild(kids[i]); if (kids[i + 1]) w.appendChild(kids[i + 1]);
+        const blank = w.querySelector('.blank');
+        if (blank) w.dataset.topic = PRACTICAL_TOPIC[blank.dataset.p] || '';
+        practicalsBox.appendChild(w);
+      }
+    }
+    function shufflePracticals() {
+      shuffle([...practicalsBox.children]).forEach(el => practicalsBox.appendChild(el));
+    }
+
+    // ---------------- Render MCQ (order + options shuffled) ----------------
+    function renderQuiz() {
+      quiz.innerHTML = '';
+      order.forEach((qi, pos) => {
+        const item = QUESTIONS[qi];
+        const tr = lang === 'uz' ? UZ[qi] : item;
+        const c = document.createElement('div'); c.className = 'card'; c.dataset.q = qi;
+        const optOrder = shuffle(item.opts.map((_, j) => j));
+        let html = '<div class="qhead"><span class="qnum">Q' + (pos + 1) + '</span><span class="qtag">' + item.g + '</span></div>'
+          + '<div class="qtext">' + tr.q + '</div>';
+        optOrder.forEach(j => {
+          html += '<label class="opt"' + (j === item.correct ? ' data-correct="1"' : '') +
+            '><input type="radio" name="q' + qi + '" value="' + j + '"><span>' + tr.opts[j] + '</span></label>';
+        });
+        html += '<div class="explain" id="exp' + qi + '"></div>';
+        c.innerHTML = html; quiz.appendChild(c);
+      });
+    }
+
+    // ---------------- Grade ----------------
+    function grade() {
+      let correct = 0, qTotal = 0;
+      order.forEach(qi => {
+        const card = quiz.querySelector('[data-q="' + qi + '"]');
+        if (card.style.display === 'none') return;   // grade only visible (filtered) questions
+        qTotal++;
+        const chosen = card.querySelector('input[name="q' + qi + '"]:checked');
+        card.querySelectorAll('.opt').forEach(o => o.classList.remove('correct', 'wrong'));
+        const correctOpt = card.querySelector('.opt[data-correct="1"]');
+        correctOpt.classList.add('correct');
+        let isRight = false;
+        if (chosen) {
+          const lbl = chosen.closest('.opt');
+          if (lbl === correctOpt) isRight = true; else lbl.classList.add('wrong');
+        }
+        if (isRight) correct++;
+        const e = document.getElementById('exp' + qi);
+        e.innerHTML = '<b>' + (isRight ? UI[lang].correct : UI[lang].answer) + '</b> ' + (lang === 'uz' ? UZ[qi].exp : QUESTIONS[qi].exp);
+        e.classList.add('show');
+      });
+
+      let pCorrect = 0, pTotal = 0;
+      practicalsBox.querySelectorAll('.practical').forEach(w => {
+        if (w.style.display === 'none') return;      // grade only visible practicals
+        w.querySelectorAll('.blank').forEach(inp => {
+          pTotal++;
+          const p = inp.dataset.p, b = +inp.dataset.b;
+          const accepted = PRACTICALS[p][b].map(norm);
+          inp.classList.remove('ok', 'no');
+          if (accepted.includes(norm(inp.value))) { inp.classList.add('ok'); pCorrect++; }
+          else inp.classList.add('no');
+        });
+        const pid = w.querySelector('.blank').dataset.p;
+        const e = document.getElementById('exp-p' + pid);
+        e.innerHTML = '<b>' + UI[lang].solution + '</b> ' + (lang === 'uz' ? PSOL_UZ[pid] : PSOL[pid]); e.classList.add('show');
+      });
+
+      const total = qTotal + pTotal, got = correct + pCorrect, pct = total ? Math.round(got / total * 100) : 0;
+      const color = pct >= 80 ? 'var(--green)' : pct >= 60 ? 'var(--amber)' : 'var(--red)';
+      document.getElementById('score').innerHTML =
+        UI[lang].score + ' <span class="pill" style="background:' + color + '22;color:' + color + '">' + got + '/' + total + ' · ' + pct + '%</span>' +
+        ' <span style="color:var(--muted);font-weight:400;font-size:12.5px">' + UI[lang].mcq + ' ' + correct + '/' + qTotal + ' · ' + UI[lang].code + ' ' + pCorrect + '/' + pTotal + '</span>';
+      const secs = (started && t0) ? Math.round((Date.now() - t0) / 1000) : 0;
+      stopTimer();
+      if (started) {
+        saveAttempt({
+          t: Date.now(), pct: pct, got: got, total: total,
+          mcq: correct + '/' + qTotal, code: pCorrect + '/' + pTotal, secs: secs, filter: currentFilter
+        });
+        renderProgress();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleSolutions() {
+      solOn = !solOn;
+      order.forEach(qi => {
+        const card = quiz.querySelector('[data-q="' + qi + '"]');
+        card.querySelectorAll('.opt').forEach(o => o.classList.remove('correct'));
+        const e = document.getElementById('exp' + qi);
+        if (solOn) {
+          card.querySelector('.opt[data-correct="1"]').classList.add('correct');
+          e.innerHTML = '<b>' + UI[lang].answer + '</b> ' + (lang === 'uz' ? UZ[qi].exp : QUESTIONS[qi].exp); e.classList.add('show');
+        } else e.classList.remove('show');
+      });
+      document.querySelectorAll('.blank').forEach(inp => {
+        const p = inp.dataset.p, b = +inp.dataset.b;
+        if (solOn) { inp.value = PRACTICALS[p][b][0]; inp.classList.remove('ok', 'no'); }
+        else inp.value = '';
+      });
+      PRACTICAL_IDS.forEach(p => {
+        const e = document.getElementById('exp-p' + p);
+        if (solOn) { e.innerHTML = '<b>' + UI[lang].solution + '</b> ' + (lang === 'uz' ? PSOL_UZ[p] : PSOL[p]); e.classList.add('show'); }
+        else e.classList.remove('show');
+      });
+    }
+
+    // ---------------- Language toggle ----------------
+    const STATIC = {
+      en: {
+        hSub: 'FAANG-level practice test · built from your Figma course + Second Brain notes',
+        hToc: '99 conceptual questions · 12 code practicals · 46 fill-in blanks',
+        aTitle: 'Part A · Conceptual Questions',
+        aSub: 'Pick the single best answer. Many are deliberately tricky — read every option. Use the buttons above to study one topic at a time.',
+        bTitle: 'Part B · Code Practicals — Fill the Blanks',
+        bSub: 'Type only what goes in each blank. Strings don’t need quotes. Click <b>Check Answers</b> to grade everything.',
+        noPractical: 'No code practical for this section. Try <b>MongoDB</b>, <b>Express</b>, <b>Auth</b>, or <b>Node.js</b>.',
+        p1h: 'Practical 1 — JWT <code style="color:var(--accent)">protect</code> middleware',
+        p2h: 'Practical 2 — Bcrypt password methods',
+        p3h: 'Practical 3 — Express controller + <code style="color:var(--accent)">catchAsync</code>',
+        p4h: 'Practical 4 — Mongoose schema',
+        p5h: 'Practical 5 — EventEmitter',
+        p6h: 'Practical 6 — Async / <code style="color:var(--accent)">Promise.all</code>',
+        p7h: 'Practical 7 — Raw Node HTTP server',
+        p8h: 'Practical 8 — Role guard <code style="color:var(--accent)">restrictTo</code>',
+        p9h: 'Practical 9 — ES Modules + fs callback',
+        p10h: 'Practical 10 — Express Router + mounting',
+        p11h: 'Practical 11 — Register / Login flow',
+        p12h: 'Practical 12 — Pagination + req.query typing',
+        progTitle: '📈 Your Progress',
+        progHint: 'Each dot is one graded attempt (hover for details). The clock starts when you answer the first question. Watch your % climb as you learn from your mistakes.',
+        progEmpty: 'No attempts yet — answer questions and press Check Answers to plot your first point.'
+      },
+      uz: {
+        hSub: 'FAANG darajasidagi mashq testi · Figma kursingiz + Second Brain qaydlaridan tuzilgan',
+        hToc: '99 nazariy savol · 12 kod amaliyoti · 46 to‘ldirish maydoni',
+        aTitle: 'A qism · Nazariy savollar',
+        aSub: 'Eng to‘g‘ri bitta javobni tanlang. Ko‘pchiligi ataylab qiyin — har bir variantni o‘qing. Bitta mavzuni o‘rganish uchun yuqoridagi tugmalardan foydalaning.',
+        bTitle: 'B qism · Kod amaliyotlari — Bo‘sh joylarni to‘ldiring',
+        bSub: 'Har bir bo‘sh joyga faqat kerakli qismini yozing. Satrlar uchun qo‘shtirnoq shart emas. Hammasini baholash uchun <b>Tekshirish</b> tugmasini bosing.',
+        noPractical: 'Bu bo‘lim uchun kod amaliyoti yo‘q. <b>MongoDB</b>, <b>Express</b>, <b>Auth</b> yoki <b>Node.js</b> ni sinab ko‘ring.',
+        p1h: '1-amaliyot — JWT <code style="color:var(--accent)">protect</code> middleware',
+        p2h: '2-amaliyot — Bcrypt parol metodlari',
+        p3h: '3-amaliyot — Express controller + <code style="color:var(--accent)">catchAsync</code>',
+        p4h: '4-amaliyot — Mongoose sxema',
+        p5h: '5-amaliyot — EventEmitter',
+        p6h: '6-amaliyot — Async / <code style="color:var(--accent)">Promise.all</code>',
+        p7h: '7-amaliyot — Xom Node HTTP server',
+        p8h: '8-amaliyot — Rol himoyasi <code style="color:var(--accent)">restrictTo</code>',
+        p9h: '9-amaliyot — ES Modules + fs callback',
+        p10h: '10-amaliyot — Express Router + ulash',
+        p11h: '11-amaliyot — Register / Login jarayoni',
+        p12h: '12-amaliyot — Pagination + req.query turlari',
+        progTitle: '📈 Sizning natijangiz',
+        progHint: 'Har bir nuqta — bitta baholangan urinish (batafsil uchun kursorni olib boring). Vaqt birinchi savolga javob berganingizda boshlanadi. Xatolardan o‘rganib, foizingiz o‘sishini kuzating.',
+        progEmpty: 'Hali urinish yo‘q — savollarga javob bering va Tekshirish tugmasini bosing, birinchi nuqtangiz chiziladi.'
+      }
+    };
+    function applyStaticLang() {
+      const d = STATIC[lang];
+      Object.keys(d).forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = d[id]; });
+      document.getElementById('btnCheck').textContent = UI[lang].check;
+      document.getElementById('btnShuffle').textContent = UI[lang].shuffle;
+      document.getElementById('btnShow').textContent = UI[lang].show;
+      document.getElementById('btnReset').textContent = UI[lang].reset;
+      document.getElementById('btnLang').textContent = UI[lang].lang;
+      document.getElementById('progClear').textContent = UI[lang].clear;
+      document.getElementById('progHint').textContent = STATIC[lang].progHint;
+      document.documentElement.lang = lang;
+    }
+    function toggleLang() {
+      lang = lang === 'uz' ? 'en' : 'uz';
+      applyStaticLang();
+      renderFilters();
+      renderQuiz();
+      clearState();
+      applyFilter();
+      armTimer();
+      renderProgress();
+      renderMockSetup();
+      renderInterview();
+    }
+
+    function clearState() {
+      document.querySelectorAll('.explain').forEach(e => { e.classList.remove('show'); e.innerHTML = ''; });
+      document.querySelectorAll('.blank').forEach(i => { i.value = ''; i.classList.remove('ok', 'no'); });
+      document.getElementById('score').innerHTML = ''; solOn = false;
+    }
+
+    function resetAll() {
+      clearState();
+      document.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+      document.querySelectorAll('.opt').forEach(o => o.classList.remove('correct', 'wrong'));
+      armTimer(); window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Re-randomize everything: question order, answer options, and practical order.
+    function shuffleAll() {
+      order = shuffle(QUESTIONS.map((_, i) => i));
+      renderQuiz();
+      shufflePracticals();
+      clearState();
+      applyFilter();
+      armTimer();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ---------------- Mock Test mode ----------------
+    let testMode = false, testOrder = [], testStart = 0, testDeadline = 0, testTick = null;
+    let mockN = 30, mockMins = 40, mockTopic = 'all', mockCode = 10, codeIds = [];
+
+    function optLen(s) { return s.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim().length; }
+    // "Hard pool": exam-style questions with no length tell — short parallel options, or correct not the clear longest.
+    function hardPool() {
+      return QUESTIONS.map((q, i) => {
+        const L = q.opts.map(optLen), c = L[q.correct], others = L.filter((_, j) => j !== q.correct), mx = Math.max.apply(null, others);
+        return ((Math.max.apply(null, L) < 48) || (c <= mx + 8)) ? i : -1;
+      }).filter(i => i >= 0);
+    }
+
+    function renderMockSetup() {
+      const m = MK[lang];
+      const chip = (v, cur, g) => '<button class="fbtn' + (v === cur ? ' active' : '') + '" data-g="' + g + '" data-v="' + v + '">' + v + '</button>';
+      const counts = [20, 30, 40, 50].map(v => chip(v, mockN, 'n')).join('');
+      const codes = [0, 5, 10].map(v => chip(v, mockCode, 'c')).join('');
+      const times = [20, 30, 40, 60].map(v => chip(v, mockMins, 't')).join('');
+      const topts = TOPICS.map(t => '<option value="' + t[2] + '"' + (t[2] === mockTopic ? ' selected' : '') + '>' + (lang === 'uz' ? t[1] : t[0]) + '</option>').join('');
+      document.getElementById('mockSetup').innerHTML =
+        '<div class="prog-head"><span>' + m.title + '</span></div>'
+        + '<div class="mock-row"><span class="mock-lab">' + m.qWord + '</span><span class="mock-chips">' + counts + '</span></div>'
+        + '<div class="mock-row"><span class="mock-lab">' + m.codeWord + '</span><span class="mock-chips">' + codes + '</span></div>'
+        + '<div class="mock-row"><span class="mock-lab">' + m.mWord + '</span><span class="mock-chips">' + times + '</span></div>'
+        + '<div class="mock-row"><span class="mock-lab">' + m.topic + '</span><select id="mockTopicSel" class="mock-sel">' + topts + '</select></div>'
+        + '<button class="btn-primary mock-start" id="btnStartMock">' + m.start + '</button>'
+        + '<div class="prog-hint">' + m.hint + '</div>';
+      document.querySelectorAll('#mockSetup .fbtn').forEach(b => { b.onclick = () => { const g = b.dataset.g, v = +b.dataset.v; if (g === 'n') mockN = v; else if (g === 't') mockMins = v; else mockCode = v; renderMockSetup(); }; });
+      document.getElementById('mockTopicSel').onchange = e => { mockTopic = e.target.value; };
+      document.getElementById('btnStartMock').onclick = startMockTest;
+    }
+
+    function startMockTest() {
+      let pool = hardPool();
+      if (mockTopic !== 'all') pool = pool.filter(i => QUESTIONS[i].g === mockTopic);
+      shuffle(pool);
+      testOrder = pool.slice(0, Math.min(mockN, pool.length));
+      testMode = true; document.body.classList.add('test-active');
+      order = testOrder; solOn = false;
+      renderQuiz();
+      // ---- coding section ----
+      codeIds = []; document.body.classList.remove('with-code');
+      practicalsBox.querySelectorAll('.practical').forEach(w => { w.style.display = 'none'; });
+      if (mockCode > 0) {
+        const ids = shuffle(PRACTICAL_IDS.slice()).slice(0, Math.min(mockCode, PRACTICAL_IDS.length));
+        codeIds = ids.slice();
+        document.body.classList.add('with-code');
+        practicalsBox.querySelectorAll('.practical').forEach(w => {
+          const bl = w.querySelector('.blank'); const pid = bl ? bl.dataset.p : null;
+          w.style.display = (pid && ids.indexOf(pid) >= 0) ? '' : 'none';
+          w.querySelectorAll('.blank').forEach(inp => { inp.value = ''; inp.classList.remove('ok', 'no'); });
+          w.querySelectorAll('.explain').forEach(e => { e.classList.remove('show'); e.innerHTML = ''; });
+        });
+      }
+      document.getElementById('testResult').style.display = 'none';
+      document.getElementById('testBar').style.display = 'block';
+      document.getElementById('btnSubmitTest').textContent = MK[lang].submit;
+      document.getElementById('btnQuitTest').textContent = MK[lang].quit;
+      updateTestProgress();
+      testStart = Date.now(); testDeadline = Date.now() + mockMins * 60000;
+      updateCountdown(); stopCountdown(); testTick = setInterval(updateCountdown, 1000);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function stopCountdown() { clearInterval(testTick); testTick = null; }
+    function updateCountdown() {
+      const rem = Math.max(0, testDeadline - Date.now());
+      const el = document.getElementById('testTimer');
+      el.textContent = fmt(rem);
+      el.classList.toggle('danger', rem <= 5 * 60000);
+      if (rem <= 0) { stopCountdown(); submitMockTest(true); }
+    }
+    function updateTestProgress() {
+      let ans = 0; testOrder.forEach(qi => { if (quiz.querySelector('input[name="q' + qi + '"]:checked')) ans++; });
+      document.getElementById('testCount').textContent = ans + '/' + testOrder.length + ' ' + MK[lang].answered;
+    }
+    function gradeTest() {
+      let correct = 0; const per = {};
+      testOrder.forEach(qi => {
+        const card = quiz.querySelector('[data-q="' + qi + '"]'); if (!card) return;
+        const g = QUESTIONS[qi].g; per[g] = per[g] || [0, 0]; per[g][1]++;
+        card.querySelectorAll('.opt').forEach(o => o.classList.remove('correct', 'wrong'));
+        const correctOpt = card.querySelector('.opt[data-correct="1"]'); correctOpt.classList.add('correct');
+        const chosen = card.querySelector('input[name="q' + qi + '"]:checked');
+        let ok = false;
+        if (chosen) { const lbl = chosen.closest('.opt'); if (lbl === correctOpt) ok = true; else lbl.classList.add('wrong'); }
+        if (ok) { correct++; per[g][0]++; }
+        const e = document.getElementById('exp' + qi);
+        e.innerHTML = '<b>' + (ok ? UI[lang].correct : UI[lang].answer) + '</b> ' + (lang === 'uz' ? UZ[qi].exp : QUESTIONS[qi].exp);
+        e.classList.add('show');
+      });
+      // coding blanks (only visible ones)
+      let cC = 0, cT = 0;
+      if (mockCode > 0) {
+        practicalsBox.querySelectorAll('.practical').forEach(w => {
+          if (w.style.display === 'none') return;
+          w.querySelectorAll('.blank').forEach(inp => {
+            cT++; const p = inp.dataset.p, b = +inp.dataset.b;
+            const acc = PRACTICALS[p][b].map(norm); inp.classList.remove('ok', 'no');
+            if (acc.includes(norm(inp.value))) { inp.classList.add('ok'); cC++; } else inp.classList.add('no');
+          });
+          const bl = w.querySelector('.blank'); if (bl) {
+            const e = document.getElementById('exp-p' + bl.dataset.p);
+            if (e) { e.innerHTML = '<b>' + UI[lang].solution + '</b> ' + (lang === 'uz' ? PSOL_UZ[bl.dataset.p] : PSOL[bl.dataset.p]); e.classList.add('show'); }
+          }
+        });
+      }
+      return { correct: correct, total: testOrder.length, per: per, cCorrect: cC, cTotal: cT };
+    }
+    function submitMockTest(auto) {
+      if (!testMode) return;
+      stopCountdown();
+      const r = gradeTest();
+      const allC = r.correct + r.cCorrect, allT = r.total + r.cTotal;
+      const pct = allT ? Math.round(allC / allT * 100) : 0;
+      const used = Math.round((Date.now() - testStart) / 1000);
+      const m = MK[lang], pass = pct >= 70, col = pass ? 'var(--green)' : 'var(--red)';
+      saveAttempt({ t: Date.now(), pct: pct, got: allC, total: allT, mcq: r.correct + '/' + r.total, code: r.cTotal ? (r.cCorrect + '/' + r.cTotal) : '—', secs: used, filter: m.mockLabel + ' ' + allT + 'Q' });
+      renderProgress();
+      let rows = Object.keys(r.per).map(g => '<tr><td>' + g + '</td><td style="text-align:right"><b>' + r.per[g][0] + '/' + r.per[g][1] + '</b></td></tr>').join('');
+      if (r.cTotal) rows += '<tr><td>' + m.codeSec + '</td><td style="text-align:right"><b>' + r.cCorrect + '/' + r.cTotal + '</b></td></tr>';
+      document.getElementById('testResult').innerHTML =
+        '<div class="res-top"><div class="res-score" style="color:' + col + '">' + pct + '%</div>'
+        + '<div class="res-meta"><div class="res-badge" style="background:' + col + '22;color:' + col + '">' + (pass ? m.pass : m.fail) + (auto ? ' · ' + m.timeUp : '') + '</div>'
+        + '<div>' + m.score + ': <b style="color:var(--text)">' + allC + ' / ' + allT + '</b></div>'
+        + '<div>' + m.timeUsed + ': <b style="color:var(--text)">' + fmtSecs(used) + '</b></div></div></div>'
+        + '<table class="res-table"><tbody>' + rows + '</tbody></table>'
+        + '<div class="res-btns"><button class="btn-ghost" id="btnReview">' + m.review + '</button>'
+        + '<button class="btn-ghost" id="btnRetake">' + m.retake + '</button>'
+        + '<button class="btn-primary" id="btnExitMock">' + m.exit + '</button></div>';
+      document.getElementById('testResult').style.display = 'block';
+      document.getElementById('testBar').style.display = 'none';
+      document.getElementById('btnReview').onclick = () => { const c = quiz.querySelector('[data-q="' + testOrder[0] + '"]'); if (c) c.scrollIntoView({ behavior: 'smooth' }); };
+      document.getElementById('btnRetake').onclick = startMockTest;
+      document.getElementById('btnExitMock').onclick = exitMockTest;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function exitMockTest() {
+      testMode = false; document.body.classList.remove('test-active', 'with-code');
+      stopCountdown();
+      document.getElementById('testResult').style.display = 'none';
+      document.getElementById('testBar').style.display = 'none';
+      shuffleAll();
+      renderProgress(); renderMockSetup();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function onQuizChange() { if (testMode) updateTestProgress(); else beginTimer(); }
+
+    // ---------------- Interview flashcards ----------------
+    let ivCat = 'all', ivDeck = [], ivPos = 0, ivShown = false;
+    function ivShort(g) { return ({ 'Node.js Core': 'Node.js', 'Express.js': 'Express', 'REST API Design': 'REST', 'MongoDB & Mongoose': 'MongoDB', 'Auth & Security': 'Auth', 'Telegram Bot': 'Telegram' })[g] || g; }
+    function ivCats() { const s = []; INTERVIEW.forEach(q => { if (s.indexOf(q.g) < 0) s.push(q.g); }); return s; }
+    function ivBuildDeck() {
+      const pool = ivCat === 'all' ? INTERVIEW.map((_, i) => i) : INTERVIEW.map((_, i) => i).filter(i => INTERVIEW[i].g === ivCat);
+      ivDeck = shuffle(pool); ivPos = 0; ivShown = false;
+    }
+    function renderInterview() {
+      const u = IVUI[lang];
+      if (!ivDeck.length) ivBuildDeck();
+      const chip = (lab, key) => '<button class="fbtn' + (key === ivCat ? ' active' : '') + '" data-k="' + key + '">' + lab + '</button>';
+      let chips = chip(u.all, 'all') + ivCats().map(g => chip(ivShort(g), g)).join('');
+      document.getElementById('interview').innerHTML =
+        '<div class="prog-head"><span>' + u.title + '</span><button class="fbtn" id="ivRandom">' + u.random + '</button></div>'
+        + '<div class="filters" style="position:static;border:none;padding:0;margin:0 0 10px;justify-content:flex-start">' + chips + '</div>'
+        + '<div class="iv-card" id="ivBody"></div>'
+        + '<div class="iv-ctrls"><button class="btn-primary" id="ivShow"></button>'
+        + '<button class="btn-ghost" id="ivPrev">' + u.prev + '</button>'
+        + '<button class="btn-ghost" id="ivNext">' + u.next + '</button></div>'
+        + '<div class="prog-hint">' + u.hint + '</div>';
+      document.querySelectorAll('#interview .filters .fbtn').forEach(b => { b.onclick = () => { ivCat = b.dataset.k; ivBuildDeck(); renderInterview(); }; });
+      document.getElementById('ivRandom').onclick = () => { ivPos = Math.floor(Math.random() * ivDeck.length); ivShown = false; ivShowCard(); };
+      document.getElementById('ivShow').onclick = () => { ivShown = !ivShown; ivShowCard(); };
+      document.getElementById('ivPrev').onclick = () => { ivPos = (ivPos - 1 + ivDeck.length) % ivDeck.length; ivShown = false; ivShowCard(); };
+      document.getElementById('ivNext').onclick = () => { ivPos = (ivPos + 1) % ivDeck.length; ivShown = false; ivShowCard(); };
+      ivShowCard();
+    }
+    function ivShowCard() {
+      const u = IVUI[lang], qi = ivDeck[ivPos];
+      const en = INTERVIEW[qi], uz = IV_UZ[qi];
+      const q = lang === 'uz' ? uz.q : en.q, a = lang === 'uz' ? uz.a : en.a;
+      document.getElementById('ivBody').innerHTML =
+        '<div class="iv-tag">' + ivShort(en.g) + ' · ' + u.q + ' ' + (ivPos + 1) + '/' + ivDeck.length + '</div>'
+        + '<div class="iv-q">' + q + '</div>'
+        + '<div class="iv-a' + (ivShown ? ' show' : '') + '">' + a + '</div>';
+      document.getElementById('ivShow').textContent = ivShown ? u.hide : u.show;
+    }
+
+    // ---------------- Timer ----------------
+    let t0 = null, tick = null, started = false;
+    function fmt(ms) { const s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+    function stopTimer() { clearInterval(tick); tick = null; }
+    function armTimer() { stopTimer(); started = false; t0 = null; document.getElementById('timer').textContent = '00:00'; }
+    // Clock starts the moment you answer the first question / type in a blank
+    function beginTimer() {
+      if (testMode || started) return; started = true; t0 = Date.now();
+      tick = setInterval(() => { document.getElementById('timer').textContent = fmt(Date.now() - t0); }, 1000);
+    }
+
+    // ---------------- Init — auto-shuffle so every open is a different order ----------------
+    applyStaticLang();
+    renderFilters();
+    renderMockSetup();
+    renderInterview();
+    wrapPracticals();
+    shuffleAll();
+    renderProgress();
+    // Start the clock on first interaction (delegated — survives re-renders)
+    quiz.addEventListener('change', onQuizChange);
+    practicalsBox.addEventListener('input', beginTimer);
+  </script>
+</body>
+
+</html>
